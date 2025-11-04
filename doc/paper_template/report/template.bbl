@@ -1,0 +1,13 @@
+\begin{thebibliography}{1}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Lastname and Author2(2025)]{Paper2025}
+Firstname Lastname and Firstname Author2.
+\newblock Title.
+\newblock \emph{IEEE Transactions on Robotics}, 12\penalty0 (3):\penalty0 123--130, 2025.
+
+\end{thebibliography}

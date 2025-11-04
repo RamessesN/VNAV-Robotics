@@ -1,0 +1,129 @@
+\documentclass[12pt,a4paper]{article}
+
+%----------------------------------------------------------------------------------------
+% PACKAGES
+%----------------------------------------------------------------------------------------
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+
+\usepackage{graphicx,booktabs,array,multirow,url}
+\usepackage{gensymb}
+\usepackage[british]{babel}
+\usepackage[square,numbers,sort&compress]{natbib}
+\usepackage{caption,subcaption}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.9}
+
+\usepackage[colorlinks=true,
+            linkcolor=blue,
+            citecolor=blue,
+            urlcolor=blue]{hyperref}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{15pt}
+\addtolength{\topmargin}{-2.5pt}
+
+\usepackage{silence}
+\WarningFilter{gensymb}{Not defining}
+
+%----------------------------------------------------------------------------------------
+% CUSTOM ABSTRACT FORMAT
+%----------------------------------------------------------------------------------------
+\makeatletter
+\renewenvironment{abstract}{
+    \begin{center}
+        \large\bfseries \abstractname
+    \end{center}
+    \begin{quote}\small
+}{
+    \end{quote}
+}
+\makeatother
+
+%----------------------------------------------------------------------------------------
+% USER INFORMATION
+%----------------------------------------------------------------------------------------
+\newcommand{\studentname}{Yuwei ZHAO}
+\newcommand{\studentnumber}{23020036096}
+\newcommand{\labgroup}{Group \#31}
+\newcommand{\labdate}{2025-11-05}
+\newcommand{\course}{Robotics Integration Group Project I}
+\newcommand{\labtitle}{Lab 1 Report}
+
+%----------------------------------------------------------------------------------------
+% TITLE
+%----------------------------------------------------------------------------------------
+\title{
+    \vspace{-1cm}
+    \textbf{\labtitle}\\[0.3em]
+    \large \course
+}
+\author{
+    \studentname~(\studentnumber)\\
+    \labgroup \quad \labdate
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+% PAGE STYLE
+%----------------------------------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\labtitle}
+\fancyhead[C]{\studentname~(\studentnumber)}
+\fancyhead[R]{\labgroup}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0.75em}
+
+%----------------------------------------------------------------------------------------
+% DOCUMENT BODY
+%----------------------------------------------------------------------------------------
+\begin{document}
+
+\maketitle
+\thispagestyle{empty}
+
+%----------------------------------------------------------------------------------------
+\begin{abstract}
+This report presents the experimental setup and results of Lab 1. 
+The focus of the experiment is on understanding the dynamics of ...
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+\section{Introduction}
+The aim of this laboratory session is to investigate fundamental control concepts ... \cite{Paper2025}
+
+%----------------------------------------------------------------------------------------
+\section{Individual Work}
+\subsection{Question 1}
+Answer here.
+
+\subsection{Question 2}
+Answer here.
+
+%----------------------------------------------------------------------------------------
+\section{Team Work}
+\subsection{Task 1}
+Description and results.
+
+\subsection{Task 2}
+Analysis and discussion.
+
+%----------------------------------------------------------------------------------------
+\section{Discussion}
+Discuss experimental errors, limitations, and possible improvements.
+
+%----------------------------------------------------------------------------------------
+\section{Conclusion}
+Summarize key findings, learning outcomes, and recommendations for future work.
+
+%----------------------------------------------------------------------------------------
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
