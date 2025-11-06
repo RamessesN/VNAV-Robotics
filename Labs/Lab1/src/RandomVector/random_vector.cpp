@@ -84,21 +84,21 @@ double RandomVector::min() {
 
 /**
  * Print a histogram of the vector elements
- * @param blocks The number of blocks in the histogram
+ * @param bins The number of bins in the histogram
  */
-void RandomVector::printHistogram(int blocks){
-  if(vect.empty() || blocks <= 0) return;
+void RandomVector::printHistogram(int bins){
+  if(vect.empty() || bins <= 0) return;
 
   double min_val = min();
   double max_val = max();
-  double block_size = (max_val - min_val) / blocks;
+  double bin_size = (max_val - min_val) / bins;
 
-  vector<int> counts(blocks, 0); // to store counts for each block
+  vector<int> counts(bins, 0); // to store counts for each bin
 
   for(double val : vect) {
-    int index = static_cast<int>((val - min_val) / block_size);
+    int index = static_cast<int>((val - min_val) / bin_size);
 
-    if(index == blocks) index--;
+    if(index == bins) index--;
 
     counts[index]++;
   }
@@ -108,8 +108,8 @@ void RandomVector::printHistogram(int blocks){
     if(count > max_count) max_count = count; // find the maximum count for scaling
 
   for(int level = max_count; level > 0; level--) {
-    for(int block = 0; block < blocks; block++) {
-      if(counts[block] >= level)
+    for(int bin = 0; bin < bins; bin++) {
+      if(counts[bin] >= level)
         cout << "***";
       else
         cout << "   ";
