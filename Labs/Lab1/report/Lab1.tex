@@ -658,6 +658,15 @@ Histogram:
         \end{verbatim}
 
     \textit{Note:} The complete code can be found at the \hyperref[section:source_code]{end} of this report.
+
+    \vspace{0.5em}
+
+    \textit{Other notes:} I found that different $OS$ will produce different random sequences even with the same seed value.
+    At first, I suspected that the discrepancy was caused by the compiler. On macOS, the native C++ compiler is \textbf{Clang}, whereas on Ubuntu it is \textbf{GCC}. 
+    However, after installing Clang on Ubuntu and recompiling the code, the generated random sequence remained identical to that produced by GCC.
+    Therefore, I concluded that the variation in random sequences arises from differences in the underlying C standard library implementations across operating systems, 
+    rather than from the compiler itself. Specifically, the \texttt{rand()} function may employ distinct algorithms or entropy sources on different platforms, resulting in divergent random outputs.
+
     \end{enumerate} 
 \end{itemize}
     
@@ -739,7 +748,8 @@ By combining Linux command-line tools, Git-based project management, and C++ pro
 % Source Code
 %----------------------------------------------------------------------------------------
 \pagestyle{empty}
-\section{Source Code}\label{sec:source_code}
+\section{Source Code}
+\label{section:source_code}
 \begin{itemize}
     \item \textit{random\_vector.cpp}
     \begin{minted}[fontsize=\footnotesize,frame=single,linenos]{cpp}
