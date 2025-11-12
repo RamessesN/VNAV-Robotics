@@ -1,0 +1,3 @@
+[submodule "Labs/Lab2/ros1_to_ubuntu2404"]
+	path = Labs/Lab2/ros1_to_ubuntu2404
+	url = https://github.com/Minoic-Intelligence/shrike.git
