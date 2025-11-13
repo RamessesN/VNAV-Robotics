@@ -1,0 +1,6 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{TransformStamped}\PYG{+w}{ }\PYG{n}{AV1World}\PYG{p}{;}
+\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{TransformStamped}\PYG{+w}{ }\PYG{n}{AV2World}\PYG{p}{;}
+\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\end{MintedVerbatim}

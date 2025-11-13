@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n}{tf2\PYGZus{}ros}\PYG{o}{::}\PYG{n}{Buffer}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{\PYGZob{}}\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{10.0}\PYG{p}{),}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{\PYGZcb{};}
+\PYG{n}{tf2\PYGZus{}ros}\PYG{o}{::}\PYG{n}{TransformListener}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}listener}\PYG{p}{\PYGZob{}}\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{\PYGZcb{};}
+\end{MintedVerbatim}

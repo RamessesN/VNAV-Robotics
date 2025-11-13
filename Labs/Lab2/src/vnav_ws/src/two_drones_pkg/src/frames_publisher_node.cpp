@@ -22,16 +22,7 @@ class FramesPublisherNode {
   }
 
   void onPublish(const ros::TimerEvent&) {
-    // NOTE: This method is called at 50Hz, due to the timer created on line 16.
-
-    // 1. Compute time elapsed in seconds since the node has been started
-    //    i.e. the time elapsed since startup_time (defined on line 8)
-    //   HINTS:
-    //   - check out the ros::Time API at
-    //     http://wiki.ros.org/roscpp/Overview/Time#Time_and_Duration
-    //   - use the - (subtraction) operator between ros::Time::now() and startup_time
-    //   - convert the resulting Duration to seconds, store result into a double
-
+    // Compute time elapsed in seconds since the node has been started
     double time = (ros::Time::now() - startup_time).toSec();
 
     // Here we declare two geometry_msgs::TransformStamped objects, which need to be populated
@@ -44,34 +35,31 @@ class FramesPublisherNode {
     // 2. Populate the transforms
 
     // --- AV1 ---
-    // origin moves along a circle [cos{t}, sin(t), 0]
     AV1World.header.stamp = ros::Time::now();
     AV1World.header.frame_id = "world";
     AV1World.child_frame_id = "av1";
-
+    // path: [cos(t), sin(t), 0]
     AV1World.transform.translation.x = cos(time);
     AV1World.transform.translation.y = sin(time);
     AV1World.transform.translation.z = 0.0;
-
-    // Orientation: yaw = time + π / 2
+    // angle: [0, 0, t]
     tf2::Quaternion q1;
-    q1.setRPY(0, 0, time + M_PI / 2.0);
+    q1.setRPY(0, 0, time);
     AV1World.transform.rotation.x = q1.x();
     AV1World.transform.rotation.y = q1.y();
     AV1World.transform.rotation.z = q1.z();
     AV1World.transform.rotation.w = q1.w();
 
     // --- AV2 ---
-    // position [sin(t), 0, cos(2t)], rotation irrelevant
     AV2World.header.stamp = ros::Time::now();
     AV2World.header.frame_id = "world";
     AV2World.child_frame_id = "av2";
-
-    AV2World.transform.translation.x = cos(time);
+    // path: [sin(t), 0, cos(2t)]
+    AV2World.transform.translation.x = sin(time);
     AV2World.transform.translation.y = 0.0;
     AV2World.transform.translation.z = cos(2 * time);
 
-    // 3. Publish the transforms using a tf2_ros::TransformBroadcaster
+    // Publish the transforms using a tf2_ros::TransformBroadcaster
     tf_broadcaster.sendTransform(AV1World);
     tf_broadcaster.sendTransform(AV2World);
   }

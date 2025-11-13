@@ -467,10 +467,10 @@ Tools such as \textit{rqt\_tf\_tree} and \textit{tf\_echo} provide intuitive mea
 Running \textit{RViz} in a virtualized environment emphasizes practical considerations for deploying visualization tools.  
 The need to enforce software rendering with \texttt{LIBGL\_ALWAYS\_SOFTWARE=1} underscores how hardware acceleration and OpenGL support directly affect performance and usability.
 
-%----------------------------------------------------------------------------------------
+%----------------------------------------------------------------------------------------\subsection{Part III}
 \subsection{Part III}
 \subsubsection{Objective}
-To utilize \textit{TF} to control the movement of drones.
+To utilize the \textit{TF} package to control the movement of drones and visualize their trajectories dynamically in \textit{RViz}.
 
 \subsubsection{Methodology}
 \begin{enumerate}
@@ -505,13 +505,125 @@ roslaunch two_drones_pkg two_drones.launch static:=True
     \end{minted}
 
     After adding the \textit{TF} display, three colored axes will appear for each coordinate frame, as illustrated in Figure~\ref{fig:two_drones_pkg}.  
-    Remember to save the RViz configuration once the setup is complete.
+    Remember to save the \textit{RViz} configuration once the setup is complete.
 
-    \item 
+    \item \textbf{Basic \textit{ROS} commands}
+    \begin{itemize}
+        \item \textbf{Listing active nodes} \\
+        The active nodes in the static scene can be verified via \textit{rqt\_graph} and the output includes:
+        \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+/frames_publisher_node
+/plots_publisher_node
+/rviz
+        \end{minted}
+
+        \item \textbf{Running without roslaunch} \\
+        The static scene can also be launched manually using \textit{rosrun}:
+        \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+rosrun two_drones_pkg frames_publisher_node
+rosrun two_drones_pkg plots_publisher_node
+rosrun rviz rviz -d path/to/rviz_config.rviz
+        \end{minted}
+        
+        \item \textbf{Node–topic relationships} \\
+        The topic connections between nodes are summarized below:
+        \begin{table}[H]
+            \renewcommand{\arraystretch}{1.3}
+            \begin{center}
+                \begin{tabular}{l|c|c|p{8cm}}
+                    \textbf{Node} & \textbf{Publishes} & \textbf{Subscribes} & \textbf{Description} \\
+                    \hline
+                    \textbf{frames\_publisher\_node} & /tf & N/A & Broadcasts the coordinate transformations of AV1 and AV2 \\
+                    \textbf{plots\_publisher\_node} & /visuals & /tf & Generates trajectory \textit{Marker}s and calculates AV2’s position relative to AV1 \\
+                    \textbf{rviz} & N/A & /visuals, /tf & Visualizes the drone grid and trajectories in 3D \\
+                \end{tabular}
+            \end{center}
+        \end{table}
+
+        \item \textbf{Effect of omitting \textit{static:=True}} \\
+        The \textit{static} argument determines whether \textit{TF} uses a static transform broadcaster.  
+        If omitted, transforms will be published dynamically at each iteration, which in dynamic scenes can increase message traffic and slightly reduce performance.
+    \end{itemize}
+
+    \item \textbf{Dynamic scene visualization} \\
+    To simulate drone movement, a \texttt{TransformBroadcaster} is instantiated to periodically send transform messages:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{cpp}
+tf2_ros::TransformBroadcaster tf_broadcaster;
+    \end{minted}
+
+    The elapsed time since startup is computed as:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{cpp}
+double time = (ros::Time::now() - startup_time).toSec();
+    \end{minted}
+
+    Each drone has an associated \texttt{TransformStamped} message:
+    \begin{minted}[fontsize=\footnotesize,breaklines,frame=single]{cpp}
+geometry_msgs::TransformStamped AV1World;
+geometry_msgs::TransformStamped AV2World;
+AV1World.transform.rotation.w = 1.0;
+AV2World.transform.rotation.w = 1.0;
+    \end{minted}
+
+    \textbf{AV1} moves along a circular path on the $xy$-plane centered at the world origin:
+    \begin{minted}[fontsize=\footnotesize,breaklines,linenos,frame=single]{cpp}
+// --- AV1 ---
+AV1World.header.frame_id = "world";
+AV1World.child_frame_id = "av1";
+AV1World.transform.translation.x = cos(time);
+AV1World.transform.translation.y = sin(time);
+AV1World.transform.translation.z = 0.0;
+
+tf2::Quaternion q1;
+q1.setRPY(0, 0, time);
+AV1World.transform.rotation.x = q1.x();
+AV1World.transform.rotation.y = q1.y();
+AV1World.transform.rotation.z = q1.z();
+AV1World.transform.rotation.w = q1.w();
+    \end{minted}
+
+    \textbf{AV2} follows a sinusoidal path along the $x$–$z$ plane:
+    \begin{minted}[fontsize=\footnotesize,breaklines,linenos,frame=single]{cpp}
+// --- AV2 ---
+AV2World.header.frame_id = "world";
+AV2World.child_frame_id = "av2";
+AV2World.transform.translation.x = sin(time);
+AV2World.transform.translation.y = 0.0;
+AV2World.transform.translation.z = cos(2 * time);
+    \end{minted}
+
+    Finally, both transforms are broadcast:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{cpp}
+tf_broadcaster.sendTransform(AV1World);
+tf_broadcaster.sendTransform(AV2World);
+    \end{minted}
+
+    The complete source code for \texttt{frames\_publisher\_node.cpp} is provided in \hyperref[section:source_code]{\texttt{Source Code}} at the end of this report.
+
+    \item \textbf{Trajectory visualization} \\
+    To visualize the drones' trajectories, \textit{TF} data is queried using \texttt{lookupTransform} to retrieve each drone’s position relative to the world frame:
+    \begin{itemize}
+        \item \textit{tf\_buffer} stores transformation history between coordinate frames.
+        \item \textit{lookupTransform(ref\_frame, dest\_frame, ros::Time(0))} retrieves the latest pose.
+        \item \textit{ros::Duration(0.1)} ensures synchronization by waiting briefly if needed.
+    \end{itemize}
+
+    Besides, with \textit{Duration(0.1)} exists but there is no other thread to process the messages from \textit{TF}.
+    Therefore, the transform buffer will never be updated unless a dedicated thread or asynchronous spinner is created to handle incoming \textit{TF} messages. 
+    In \textit{tf2\_ros}, this can be achieved by enabling the internal thread of the \textit{TransformListener}, which continuously listens to the TF topic and updates the buffer in the background, as shown below:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{cpp}
+tf2_ros::Buffer tf_buffer{ros::Duration(10.0), true};
+tf2_ros::TransformListener tf_listener{tf_buffer};
+    \end{minted}
+
+    Here, the second parameter \texttt{true} tells the listener to spawn a dedicated thread to process incoming TF data asynchronously. 
+    Without this background thread, the buffer would remain empty, and any subsequent calls to 
+    \texttt{lookupTransform()} would fail with a time extrapolation or "transform not found" error.
+
+    These steps ensure that \textit{RViz} dynamically updates both trajectories in real time.  
+    The resulting visualization is shown in Figure~\ref{fig:drones_path}.
 \end{enumerate}
 
 \subsubsection{Observations}
-
 \begin{figure}[H]
     \centering
     \begin{minipage}[b]{0.48\textwidth}
@@ -525,33 +637,31 @@ roslaunch two_drones_pkg two_drones.launch static:=True
         \includegraphics[width=\textwidth]{./source/img/partIV_2.png}
         \caption*{(b) catkin build}
     \end{minipage}
-    \caption{catkin init \& build}
+    \caption{Catkin workspace initialization and build}
     \label{fig:catkin_init_build}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{./source/img/partIV_3.png}
-    \caption{Two drones}
+    \includegraphics[width=0.5\textwidth]{./source/img/partIV_3.png}
+    \caption{Static visualization of two drones in \textit{RViz}}
     \label{fig:two_drones_pkg}
 \end{figure}
 
-\subsubsection{Discussion}
-% TODO: Write the discussion of Part III.
-
-%----------------------------------------------------------------------------------------
-\subsection{Part IV}
-\subsubsection{Objective}
-% TODO: Write the objective of Part IV.
-
-\subsubsection{Methodology}
-% TODO: Write the methodology of Part IV.
-
-\subsubsection{Observations}
-% TODO: Write the observations of Part IV.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{./source/img/partIV_4.png}
+    \caption{Dynamic trajectories of two drones in \textit{RViz}}
+    \label{fig:drones_path}
+\end{figure}
 
 \subsubsection{Discussion}
-% TODO: Write the discussion of Part IV.
+This session successfully demonstrates how \textit{TF} enables both static and dynamic spatial relationships to be visualized in real time.  
+In the \textbf{static} case, each transform is broadcast only once, minimizing system overhead. 
+In contrast, \textbf{dynamic} broadcasting continuously updates transforms according to the elapsed time, allowing for smooth motion visualization but at a higher computational and communication cost.
+
+The design of the two distinct motion models—circular motion for AV1 and sinusoidal motion for AV2—illustrates the flexibility of \textit{TF} in representing diverse kinematic behaviors. 
+By combining \textit{tf2\_ros::TransformBroadcaster} with \textit{lookupTransform}, the system maintains synchronization between frames and ensures that \textit{RViz} accurately reflects the relative positions and orientations of both drones.
 
 %----------------------------------------------------------------------------------------
 \section{Reflection and Analysis}
@@ -568,6 +678,260 @@ roslaunch two_drones_pkg two_drones.launch static:=True
 \pagestyle{empty}
 \section{Source Code}
 \label{section:source_code}
+\begin{itemize}
+    \item \textit{frames\_publisher\_node.cpp}
+    \begin{minted}[fontsize=\footnotesize,frame=single,linenos,breaklines]{cpp}
+#include <ros/ros.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <tf2/LinearMath/Quaternion.h>
+
+#include <iostream>
+
+class FramesPublisherNode {
+    private:
+    ros::NodeHandle nh;
+    ros::Time startup_time;
+
+    ros::Timer heartbeat;
+
+    tf2_ros::TransformBroadcaster tf_broadcaster;
+
+    public:
+    FramesPublisherNode() {
+        // NOTE: This method is run once, when the node is launched.
+        startup_time = ros::Time::now();
+        heartbeat = nh.createTimer(ros::Duration(0.02), &FramesPublisherNode::onPublish, this);
+        heartbeat.start();
+    }
+
+    void onPublish(const ros::TimerEvent&) {
+        double time = (ros::Time::now() - startup_time).toSec();
+
+        geometry_msgs::TransformStamped AV1World;
+        geometry_msgs::TransformStamped AV2World;
+
+        AV1World.transform.rotation.w = 1.0;
+        AV2World.transform.rotation.w = 1.0;
+
+        // --- AV1 ---
+        AV1World.header.stamp = ros::Time::now();
+        AV1World.header.frame_id = "world";
+        AV1World.child_frame_id = "av1";
+        // path: [cos(t), sin(t), 0]
+        AV1World.transform.translation.x = cos(time);
+        AV1World.transform.translation.y = sin(time);
+        AV1World.transform.translation.z = 0.0;
+        // angle: [0, 0, t]
+        tf2::Quaternion q1;
+        q1.setRPY(0, 0, time);
+        AV1World.transform.rotation.x = q1.x();
+        AV1World.transform.rotation.y = q1.y();
+        AV1World.transform.rotation.z = q1.z();
+        AV1World.transform.rotation.w = q1.w();
+
+        // --- AV2 ---
+        AV2World.header.stamp = ros::Time::now();
+        AV2World.header.frame_id = "world";
+        AV2World.child_frame_id = "av2";
+        // path: [sin(t), 0, cos(2t)]
+        AV2World.transform.translation.x = sin(time);
+        AV2World.transform.translation.y = 0.0;
+        AV2World.transform.translation.z = cos(2 * time);
+
+        // Publish the transforms
+        tf_broadcaster.sendTransform(AV1World);
+        tf_broadcaster.sendTransform(AV2World);
+    }
+};
+
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "frames_publisher_node");
+    FramesPublisherNode node;
+    ros::spin();
+    return 0;
+}
+    \end{minted}
+
+    \item \textit{plots\_publisher\_node.cpp}
+    \begin{minted}[fontsize=\footnotesize,frame=single,linenos,breaklines]{cpp}
+#include <geometry_msgs/Point.h>
+#include <ros/ros.h>
+#include <tf2_ros/transform_listener.h>
+#include <visualization_msgs/MarkerArray.h>
+
+#include <iostream>
+#include <list>
+
+class PlotsPublisherNode {
+  ros::Time startup_time;
+  ros::Timer heartbeat;
+  ros::NodeHandle nh;
+  ros::Publisher markers_pub;
+  tf2_ros::Buffer tf_buffer{ros::Duration(10.0), true};
+  tf2_ros::TransformListener tf_listener{tf_buffer};
+  int num_trails;
+
+  class TrajTrail {
+    PlotsPublisherNode* parent;
+    static int id;
+    std::list<geometry_msgs::Point> poses;
+    std::string ref_frame, dest_frame;
+    size_t buffer_size;
+
+    std::string ns;
+    float r, g, b, a;
+
+    visualization_msgs::Marker marker_out;
+
+    void update() {
+      // NOTE: you need to populate this transform
+      geometry_msgs::TransformStamped transform;
+      try {
+        transform = parent->tf_buffer.lookupTransform(
+          ref_frame,
+          dest_frame,
+          ros::Time(0),
+          ros::Duration(0.1)
+        );
+
+        while (poses.size() >= buffer_size) {
+          poses.pop_front();
+        }
+
+        geometry_msgs::Point tmp;
+        tmp.x = transform.transform.translation.x;
+        tmp.y = transform.transform.translation.y;
+        tmp.z = transform.transform.translation.z;
+        poses.push_back(tmp);
+      } catch (const tf2::TransformException& ex) {
+        ROS_ERROR_STREAM("transform lookup failed: " << ex.what());
+      }
+    }
+
+   public:
+    TrajTrail() : parent(nullptr){};
+
+    TrajTrail(PlotsPublisherNode* parent_,
+              const std::string& ref_frame_,
+              const std::string& dest_frame_,
+              int buffer_size_ = 160)
+        : parent(parent_),
+          ref_frame(ref_frame_),
+          dest_frame(dest_frame_),
+          buffer_size(buffer_size_) {
+      if (buffer_size <= 0) {
+        ROS_ERROR_STREAM("invalid buffer size! defaulting to 10");
+        buffer_size = 10;
+      }
+
+      marker_out.header.frame_id = ref_frame;
+      marker_out.ns = "trails";
+      marker_out.id = parent->num_trails++;
+      marker_out.type = visualization_msgs::Marker::LINE_STRIP;
+      marker_out.action = visualization_msgs::Marker::ADD;
+      marker_out.color.a = 0.8;
+      marker_out.scale.x = 0.02;
+      marker_out.lifetime = ros::Duration(1.0);
+    }
+
+    void setColor(float r_, float g_, float b_) {
+      marker_out.color.r = r_;
+      marker_out.color.g = g_;
+      marker_out.color.b = b_;
+    }
+
+    void setNamespace(const std::string& ns_) { marker_out.ns = ns_; }
+
+    void setDashed() { marker_out.type = visualization_msgs::Marker::LINE_LIST; }
+
+    visualization_msgs::Marker getMarker() {
+      update();
+      marker_out.header.stamp = ros::Time::now();
+      marker_out.points.clear();
+      for (auto& p : poses) marker_out.points.push_back(p);
+
+      if (marker_out.type == visualization_msgs::Marker::LINE_LIST && poses.size() % 2)
+        marker_out.points.resize(poses.size() - 1);
+
+      return marker_out;
+    }
+  };
+
+  TrajTrail av1trail;
+  TrajTrail av2trail;
+  TrajTrail av2trail_rel;
+
+ public:
+  PlotsPublisherNode() : tf_listener(tf_buffer), num_trails(0) {
+    startup_time = ros::Time::now();
+    markers_pub = nh.advertise<visualization_msgs::MarkerArray>("visuals", 0);
+    heartbeat =
+        nh.createTimer(ros::Duration(0.02), &PlotsPublisherNode::onPublish, this);
+    heartbeat.start();
+    av1trail = TrajTrail(this, "world", "av1", 300);
+    av1trail.setColor(0.25, 0.52, 1.0);
+    av1trail.setNamespace("Trail av1-world");
+    av2trail = TrajTrail(this, "world", "av2", 300);
+    av2trail.setColor(0.8, 0.4, 0.26);
+    av2trail.setNamespace("Trail av2-world");
+    av2trail_rel = TrajTrail(this, "av1", "av2", 160);
+    av2trail_rel.setDashed();
+    av2trail_rel.setColor(0.8, 0.4, 0.26);
+    av2trail_rel.setNamespace("Trail av2-av1");
+
+    ROS_INFO_STREAM("Waiting for av1 and av2 transforms to be broadcast...");
+    while (ros::ok()) {
+      const bool av1_present = tf_buffer.canTransform("av1", "world", ros::Time(0));
+      const bool av2_present = tf_buffer.canTransform("av2", "world", ros::Time(0));
+      if (av1_present && av2_present) {
+        ROS_INFO_STREAM("Necessary frames are present, starting!");
+        break;
+      }
+    }
+  }
+
+  void onPublish(const ros::TimerEvent&) {
+    visualization_msgs::MarkerArray visuals;
+    visuals.markers.resize(2);
+    visualization_msgs::Marker& av1(visuals.markers[0]);
+    visualization_msgs::Marker& av2(visuals.markers[1]);
+    av1.header.frame_id = "av1";
+    av1.ns = "AVs";
+    av1.id = 0;
+    av1.header.stamp = ros::Time();
+    av1.type = visualization_msgs::Marker::MESH_RESOURCE;
+    av1.mesh_resource = "package://two_drones_pkg/mesh/quadrotor.dae";
+    av1.action = visualization_msgs::Marker::ADD;
+    av1.pose.orientation.w = 1.0;
+    av1.scale.x = av1.scale.y = av1.scale.z = av1.color.a = 1.0;
+    av1.color.r = 0.25;
+    av1.color.g = 0.52;
+    av1.color.b = 1.0;
+    av1.lifetime = ros::Duration(1.0);
+    av2 = av1;
+    av2.header.frame_id = "av2";
+    av2.ns = "AVs";
+    av2.id = 1;
+    av2.color.r = 0.8;
+    av2.color.g = 0.4;
+    av2.color.b = 0.26;
+
+    // Trails
+    visuals.markers.push_back(av1trail.getMarker());
+    visuals.markers.push_back(av2trail.getMarker());
+    visuals.markers.push_back(av2trail_rel.getMarker());
+    markers_pub.publish(visuals);
+  }
+};
+
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "plots_publisher_node");
+  PlotsPublisherNode node;
+  ros::spin();
+  return 0;
+}
+    \end{minted}
+\end{itemize}
 
 
 

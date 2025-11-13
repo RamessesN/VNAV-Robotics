@@ -1,0 +1,71 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}ros/ros.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}tf2\PYGZus{}ros/transform\PYGZus{}broadcaster.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}tf2/LinearMath/Quaternion.h\PYGZgt{}}
+
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}iostream\PYGZgt{}}
+
+\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{FramesPublisherNode}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{k}{private}\PYG{o}{:}
+\PYG{+w}{    }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{NodeHandle}\PYG{+w}{ }\PYG{n}{nh}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{+w}{ }\PYG{n}{startup\PYGZus{}time}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Timer}\PYG{+w}{ }\PYG{n}{heartbeat}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{n}{tf2\PYGZus{}ros}\PYG{o}{::}\PYG{n}{TransformBroadcaster}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}broadcaster}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{k}{public}\PYG{o}{:}
+\PYG{+w}{    }\PYG{n}{FramesPublisherNode}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{c+c1}{// NOTE: This method is run once, when the node is launched.}
+\PYG{+w}{        }\PYG{n}{startup\PYGZus{}time}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{o}{::}\PYG{n}{now}\PYG{p}{();}
+\PYG{+w}{        }\PYG{n}{heartbeat}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{nh}\PYG{p}{.}\PYG{n}{createTimer}\PYG{p}{(}\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{0.02}\PYG{p}{),}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{FramesPublisherNode}\PYG{o}{::}\PYG{n}{onPublish}\PYG{p}{,}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{heartbeat}\PYG{p}{.}\PYG{n}{start}\PYG{p}{();}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{onPublish}\PYG{p}{(}\PYG{k}{const}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{TimerEvent}\PYG{o}{\PYGZam{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{k+kt}{double}\PYG{+w}{ }\PYG{n}{time}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{o}{::}\PYG{n}{now}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{n}{startup\PYGZus{}time}\PYG{p}{).}\PYG{n}{toSec}\PYG{p}{();}
+
+\PYG{+w}{        }\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{TransformStamped}\PYG{+w}{ }\PYG{n}{AV1World}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{TransformStamped}\PYG{+w}{ }\PYG{n}{AV2World}\PYG{p}{;}
+
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+
+\PYG{+w}{        }\PYG{c+c1}{// \PYGZhy{}\PYGZhy{}\PYGZhy{} AV1 \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{stamp}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{o}{::}\PYG{n}{now}\PYG{p}{();}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}world\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{child\PYGZus{}frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av1\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{        }\PYG{c+c1}{// path: [cos(t), sin(t), 0]}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{cos}\PYG{p}{(}\PYG{n}{time}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{sin}\PYG{p}{(}\PYG{n}{time}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{z}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{        }\PYG{c+c1}{// angle: [0, 0, t]}
+\PYG{+w}{        }\PYG{n}{tf2}\PYG{o}{::}\PYG{n}{Quaternion}\PYG{+w}{ }\PYG{n}{q1}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{q1}\PYG{p}{.}\PYG{n}{setRPY}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{time}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q1}\PYG{p}{.}\PYG{n}{x}\PYG{p}{();}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q1}\PYG{p}{.}\PYG{n}{y}\PYG{p}{();}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{z}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q1}\PYG{p}{.}\PYG{n}{z}\PYG{p}{();}
+\PYG{+w}{        }\PYG{n}{AV1World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{rotation}\PYG{p}{.}\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{q1}\PYG{p}{.}\PYG{n}{w}\PYG{p}{();}
+
+\PYG{+w}{        }\PYG{c+c1}{// \PYGZhy{}\PYGZhy{}\PYGZhy{} AV2 \PYGZhy{}\PYGZhy{}\PYGZhy{}}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{stamp}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{o}{::}\PYG{n}{now}\PYG{p}{();}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}world\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{child\PYGZus{}frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av2\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{        }\PYG{c+c1}{// path: [sin(t), 0, cos(2t)]}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{sin}\PYG{p}{(}\PYG{n}{time}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.0}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{AV2World}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{z}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{cos}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{+w}{ }\PYG{o}{*}\PYG{+w}{ }\PYG{n}{time}\PYG{p}{);}
+
+\PYG{+w}{        }\PYG{c+c1}{// Publish the transforms}
+\PYG{+w}{        }\PYG{n}{tf\PYGZus{}broadcaster}\PYG{p}{.}\PYG{n}{sendTransform}\PYG{p}{(}\PYG{n}{AV1World}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{tf\PYGZus{}broadcaster}\PYG{p}{.}\PYG{n}{sendTransform}\PYG{p}{(}\PYG{n}{AV2World}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{};}
+
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n+nf}{main}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{char}\PYG{o}{**}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{init}\PYG{p}{(}\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}frames\PYGZus{}publisher\PYGZus{}node\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{FramesPublisherNode}\PYG{+w}{ }\PYG{n}{node}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{spin}\PYG{p}{();}
+\PYG{+w}{    }\PYG{k}{return}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

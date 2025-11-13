@@ -1,0 +1,5 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+rosrun\PYG{+w}{ }two\PYGZus{}drones\PYGZus{}pkg\PYG{+w}{ }frames\PYGZus{}publisher\PYGZus{}node
+rosrun\PYG{+w}{ }two\PYGZus{}drones\PYGZus{}pkg\PYG{+w}{ }plots\PYGZus{}publisher\PYGZus{}node
+rosrun\PYG{+w}{ }rviz\PYG{+w}{ }rviz\PYG{+w}{ }\PYGZhy{}d\PYG{+w}{ }path/to/rviz\PYGZus{}config.rviz
+\end{MintedVerbatim}

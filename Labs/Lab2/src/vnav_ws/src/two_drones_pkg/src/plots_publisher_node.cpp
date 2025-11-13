@@ -11,8 +11,8 @@ class PlotsPublisherNode {
   ros::Timer heartbeat;
   ros::NodeHandle nh;
   ros::Publisher markers_pub;
-  tf2_ros::TransformListener tf_listener;
-  tf2_ros::Buffer tf_buffer;
+  tf2_ros::Buffer tf_buffer{ros::Duration(10.0), true};
+  tf2_ros::TransformListener tf_listener{tf_buffer};
   int num_trails;
 
   class TrajTrail {
@@ -31,26 +31,13 @@ class PlotsPublisherNode {
       // NOTE: you need to populate this transform
       geometry_msgs::TransformStamped transform;
       try {
-        // ~~~~~~~~~~~~~~~~~~~~~~  BEGIN OF EDIT SECTION  ~~~~~~~~~~~~~~~~~~~~~~~~~
+        transform = parent->tf_buffer.lookupTransform(
+          ref_frame,
+          dest_frame,
+          ros::Time(0),
+          ros::Duration(0.1)
+        );
 
-        /* The transform object needs to be populated with the most recent
-         * transform from ref_frame to dest_frame as provided by tf.
-
-         * Relevant variables in this scope:
-         *   - ref_frame, the frame of reference relative to which the trajectory
-         *                needs to be plotted (given)
-         *   - dest_frame, the frame of reference of the object whose trajectory
-         *                 needs to be plotted (given)
-         *   - parent->tf_buffer, a tf2_ros::Buffer object (given)
-         *   - transform, the geometry_msgs::TransformStamped object that needs to be populated
-         *
-         * HINT: use "lookupTransform", see
-         * https://wiki.ros.org/tf2/Tutorials/Writing%20a%20tf2%20listener%20%28C%2B%2B%29#TheCode
-         */
-
-        // *** FILL IN ***
-
-        // ~~~~~~~~~~~~~~~~~~~~~~~~  END OF EDIT SECTION  ~~~~~~~~~~~~~~~~~~~~~~~~~
         while (poses.size() >= buffer_size) {
           poses.pop_front();
         }

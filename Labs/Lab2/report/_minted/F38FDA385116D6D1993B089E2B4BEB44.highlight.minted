@@ -1,0 +1,178 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}geometry\PYGZus{}msgs/Point.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}ros/ros.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}tf2\PYGZus{}ros/transform\PYGZus{}listener.h\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}visualization\PYGZus{}msgs/MarkerArray.h\PYGZgt{}}
+
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}iostream\PYGZgt{}}
+\PYG{c+cp}{\PYGZsh{}include}\PYG{+w}{ }\PYG{c+cpf}{\PYGZlt{}list\PYGZgt{}}
+
+\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{PlotsPublisherNode}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{+w}{ }\PYG{n}{startup\PYGZus{}time}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Timer}\PYG{+w}{ }\PYG{n}{heartbeat}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{NodeHandle}\PYG{+w}{ }\PYG{n}{nh}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Publisher}\PYG{+w}{ }\PYG{n}{markers\PYGZus{}pub}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{tf2\PYGZus{}ros}\PYG{o}{::}\PYG{n}{Buffer}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{\PYGZob{}}\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{10.0}\PYG{p}{),}\PYG{+w}{ }\PYG{n+nb}{true}\PYG{p}{\PYGZcb{};}
+\PYG{+w}{  }\PYG{n}{tf2\PYGZus{}ros}\PYG{o}{::}\PYG{n}{TransformListener}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}listener}\PYG{p}{\PYGZob{}}\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{\PYGZcb{};}
+\PYG{+w}{  }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{num\PYGZus{}trails}\PYG{p}{;}
+
+\PYG{+w}{  }\PYG{k}{class}\PYG{+w}{ }\PYG{n+nc}{TrajTrail}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{PlotsPublisherNode}\PYG{o}{*}\PYG{+w}{ }\PYG{n}{parent}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k}{static}\PYG{+w}{ }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{id}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{std}\PYG{o}{::}\PYG{n}{list}\PYG{o}{\PYGZlt{}}\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Point}\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{n}{poses}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{std}\PYG{o}{::}\PYG{n}{string}\PYG{+w}{ }\PYG{n}{ref\PYGZus{}frame}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{dest\PYGZus{}frame}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{size\PYGZus{}t}\PYG{+w}{ }\PYG{n}{buffer\PYGZus{}size}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{n}{std}\PYG{o}{::}\PYG{n}{string}\PYG{+w}{ }\PYG{n}{ns}\PYG{p}{;}
+\PYG{+w}{    }\PYG{k+kt}{float}\PYG{+w}{ }\PYG{n}{r}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{g}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{b}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{a}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{+w}{ }\PYG{n}{marker\PYGZus{}out}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n+nf}{update}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{c+c1}{// NOTE: you need to populate this transform}
+\PYG{+w}{      }\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{TransformStamped}\PYG{+w}{ }\PYG{n}{transform}\PYG{p}{;}
+\PYG{+w}{      }\PYG{k}{try}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{transform}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{parent}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{.}\PYG{n}{lookupTransform}\PYG{p}{(}
+\PYG{+w}{          }\PYG{n}{ref\PYGZus{}frame}\PYG{p}{,}
+\PYG{+w}{          }\PYG{n}{dest\PYGZus{}frame}\PYG{p}{,}
+\PYG{+w}{          }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{),}
+\PYG{+w}{          }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{0.1}\PYG{p}{)}
+\PYG{+w}{        }\PYG{p}{);}
+
+\PYG{+w}{        }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{poses}\PYG{p}{.}\PYG{n}{size}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{\PYGZgt{}=}\PYG{+w}{ }\PYG{n}{buffer\PYGZus{}size}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{n}{poses}\PYG{p}{.}\PYG{n}{pop\PYGZus{}front}\PYG{p}{();}
+\PYG{+w}{        }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{        }\PYG{n}{geometry\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Point}\PYG{+w}{ }\PYG{n}{tmp}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{tmp}\PYG{p}{.}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{transform}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{x}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{tmp}\PYG{p}{.}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{transform}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{y}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{tmp}\PYG{p}{.}\PYG{n}{z}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{transform}\PYG{p}{.}\PYG{n}{transform}\PYG{p}{.}\PYG{n}{translation}\PYG{p}{.}\PYG{n}{z}\PYG{p}{;}
+\PYG{+w}{        }\PYG{n}{poses}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{tmp}\PYG{p}{);}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}\PYG{+w}{ }\PYG{k}{catch}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{const}\PYG{+w}{ }\PYG{n}{tf2}\PYG{o}{::}\PYG{n}{TransformException}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{ex}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{ROS\PYGZus{}ERROR\PYGZus{}STREAM}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}transform lookup failed: \PYGZdq{}}\PYG{+w}{ }\PYG{o}{\PYGZlt{}\PYGZlt{}}\PYG{+w}{ }\PYG{n}{ex}\PYG{p}{.}\PYG{n}{what}\PYG{p}{());}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{   }\PYG{k}{public}\PYG{o}{:}
+\PYG{+w}{    }\PYG{n}{TrajTrail}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{parent}\PYG{p}{(}\PYG{k}{nullptr}\PYG{p}{)\PYGZob{}\PYGZcb{};}
+
+\PYG{+w}{    }\PYG{n}{TrajTrail}\PYG{p}{(}\PYG{n}{PlotsPublisherNode}\PYG{o}{*}\PYG{+w}{ }\PYG{n}{parent\PYGZus{}}\PYG{p}{,}
+\PYG{+w}{              }\PYG{k}{const}\PYG{+w}{ }\PYG{n}{std}\PYG{o}{::}\PYG{n}{string}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{ref\PYGZus{}frame\PYGZus{}}\PYG{p}{,}
+\PYG{+w}{              }\PYG{k}{const}\PYG{+w}{ }\PYG{n}{std}\PYG{o}{::}\PYG{n}{string}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{dest\PYGZus{}frame\PYGZus{}}\PYG{p}{,}
+\PYG{+w}{              }\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{buffer\PYGZus{}size\PYGZus{}}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{160}\PYG{p}{)}
+\PYG{+w}{        }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{parent}\PYG{p}{(}\PYG{n}{parent\PYGZus{}}\PYG{p}{),}
+\PYG{+w}{          }\PYG{n}{ref\PYGZus{}frame}\PYG{p}{(}\PYG{n}{ref\PYGZus{}frame\PYGZus{}}\PYG{p}{),}
+\PYG{+w}{          }\PYG{n}{dest\PYGZus{}frame}\PYG{p}{(}\PYG{n}{dest\PYGZus{}frame\PYGZus{}}\PYG{p}{),}
+\PYG{+w}{          }\PYG{n}{buffer\PYGZus{}size}\PYG{p}{(}\PYG{n}{buffer\PYGZus{}size\PYGZus{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{buffer\PYGZus{}size}\PYG{+w}{ }\PYG{o}{\PYGZlt{}=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{ROS\PYGZus{}ERROR\PYGZus{}STREAM}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}invalid buffer size! defaulting to 10\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{        }\PYG{n}{buffer\PYGZus{}size}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{10}\PYG{p}{;}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ref\PYGZus{}frame}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{ns}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}trails\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{parent}\PYG{o}{\PYGZhy{}\PYGZgt{}}\PYG{n}{num\PYGZus{}trails}\PYG{o}{++}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{type}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{::}\PYG{n}{LINE\PYGZus{}STRIP}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{action}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{::}\PYG{n}{ADD}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{a}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.8}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{scale}\PYG{p}{.}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.02}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{lifetime}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{setColor}\PYG{p}{(}\PYG{k+kt}{float}\PYG{+w}{ }\PYG{n}{r\PYGZus{}}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{float}\PYG{+w}{ }\PYG{n}{g\PYGZus{}}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{float}\PYG{+w}{ }\PYG{n}{b\PYGZus{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{r}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{r\PYGZus{}}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{g}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{g\PYGZus{}}\PYG{p}{;}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{b}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{b\PYGZus{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{setNamespace}\PYG{p}{(}\PYG{k}{const}\PYG{+w}{ }\PYG{n}{std}\PYG{o}{::}\PYG{n}{string}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{ns\PYGZus{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{ns}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ns\PYGZus{}}\PYG{p}{;}\PYG{+w}{ }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{setDashed}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{type}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{::}\PYG{n}{LINE\PYGZus{}LIST}\PYG{p}{;}\PYG{+w}{ }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{    }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{+w}{ }\PYG{n}{getMarker}\PYG{p}{()}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{n}{update}\PYG{p}{();}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{stamp}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{o}{::}\PYG{n}{now}\PYG{p}{();}
+\PYG{+w}{      }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{points}\PYG{p}{.}\PYG{n}{clear}\PYG{p}{();}
+\PYG{+w}{      }\PYG{k}{for}\PYG{+w}{ }\PYG{p}{(}\PYG{k}{auto}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n}{p}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{poses}\PYG{p}{)}\PYG{+w}{ }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{points}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{p}\PYG{p}{);}
+
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{type}\PYG{+w}{ }\PYG{o}{==}\PYG{+w}{ }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{::}\PYG{n}{LINE\PYGZus{}LIST}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{poses}\PYG{p}{.}\PYG{n}{size}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{\PYGZpc{}}\PYG{+w}{ }\PYG{l+m+mi}{2}\PYG{p}{)}
+\PYG{+w}{        }\PYG{n}{marker\PYGZus{}out}\PYG{p}{.}\PYG{n}{points}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{n}{poses}\PYG{p}{.}\PYG{n}{size}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{\PYGZhy{}}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{);}
+
+\PYG{+w}{      }\PYG{k}{return}\PYG{+w}{ }\PYG{n}{marker\PYGZus{}out}\PYG{p}{;}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{};}
+
+\PYG{+w}{  }\PYG{n}{TrajTrail}\PYG{+w}{ }\PYG{n}{av1trail}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{TrajTrail}\PYG{+w}{ }\PYG{n}{av2trail}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{TrajTrail}\PYG{+w}{ }\PYG{n}{av2trail\PYGZus{}rel}\PYG{p}{;}
+
+\PYG{+w}{ }\PYG{k}{public}\PYG{o}{:}
+\PYG{+w}{  }\PYG{n}{PlotsPublisherNode}\PYG{p}{()}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}listener}\PYG{p}{(}\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{),}\PYG{+w}{ }\PYG{n}{num\PYGZus{}trails}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{startup\PYGZus{}time}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{o}{::}\PYG{n}{now}\PYG{p}{();}
+\PYG{+w}{    }\PYG{n}{markers\PYGZus{}pub}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{nh}\PYG{p}{.}\PYG{n}{advertise}\PYG{o}{\PYGZlt{}}\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{MarkerArray}\PYG{o}{\PYGZgt{}}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}visuals\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{heartbeat}\PYG{+w}{ }\PYG{o}{=}
+\PYG{+w}{        }\PYG{n}{nh}\PYG{p}{.}\PYG{n}{createTimer}\PYG{p}{(}\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{0.02}\PYG{p}{),}\PYG{+w}{ }\PYG{o}{\PYGZam{}}\PYG{n}{PlotsPublisherNode}\PYG{o}{::}\PYG{n}{onPublish}\PYG{p}{,}\PYG{+w}{ }\PYG{k}{this}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{heartbeat}\PYG{p}{.}\PYG{n}{start}\PYG{p}{();}
+\PYG{+w}{    }\PYG{n}{av1trail}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{TrajTrail}\PYG{p}{(}\PYG{k}{this}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}world\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av1\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{300}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av1trail}\PYG{p}{.}\PYG{n}{setColor}\PYG{p}{(}\PYG{l+m+mf}{0.25}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mf}{0.52}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av1trail}\PYG{p}{.}\PYG{n}{setNamespace}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Trail av1\PYGZhy{}world\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2trail}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{TrajTrail}\PYG{p}{(}\PYG{k}{this}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}world\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av2\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{300}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2trail}\PYG{p}{.}\PYG{n}{setColor}\PYG{p}{(}\PYG{l+m+mf}{0.8}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mf}{0.4}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mf}{0.26}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2trail}\PYG{p}{.}\PYG{n}{setNamespace}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Trail av2\PYGZhy{}world\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2trail\PYGZus{}rel}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{TrajTrail}\PYG{p}{(}\PYG{k}{this}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av1\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av2\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mi}{160}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2trail\PYGZus{}rel}\PYG{p}{.}\PYG{n}{setDashed}\PYG{p}{();}
+\PYG{+w}{    }\PYG{n}{av2trail\PYGZus{}rel}\PYG{p}{.}\PYG{n}{setColor}\PYG{p}{(}\PYG{l+m+mf}{0.8}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mf}{0.4}\PYG{p}{,}\PYG{+w}{ }\PYG{l+m+mf}{0.26}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2trail\PYGZus{}rel}\PYG{p}{.}\PYG{n}{setNamespace}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Trail av2\PYGZhy{}av1\PYGZdq{}}\PYG{p}{);}
+
+\PYG{+w}{    }\PYG{n}{ROS\PYGZus{}INFO\PYGZus{}STREAM}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Waiting for av1 and av2 transforms to be broadcast...\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{    }\PYG{k}{while}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{ros}\PYG{o}{::}\PYG{n}{ok}\PYG{p}{())}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{k}{const}\PYG{+w}{ }\PYG{k+kt}{bool}\PYG{+w}{ }\PYG{n}{av1\PYGZus{}present}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{.}\PYG{n}{canTransform}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}av1\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}world\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{));}
+\PYG{+w}{      }\PYG{k}{const}\PYG{+w}{ }\PYG{k+kt}{bool}\PYG{+w}{ }\PYG{n}{av2\PYGZus{}present}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{tf\PYGZus{}buffer}\PYG{p}{.}\PYG{n}{canTransform}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}av2\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}world\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{));}
+\PYG{+w}{      }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{av1\PYGZus{}present}\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }\PYG{n}{av2\PYGZus{}present}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{        }\PYG{n}{ROS\PYGZus{}INFO\PYGZus{}STREAM}\PYG{p}{(}\PYG{l+s}{\PYGZdq{}Necessary frames are present, starting!\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{        }\PYG{k}{break}\PYG{p}{;}
+\PYG{+w}{      }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+
+\PYG{+w}{  }\PYG{k+kt}{void}\PYG{+w}{ }\PYG{n}{onPublish}\PYG{p}{(}\PYG{k}{const}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{TimerEvent}\PYG{o}{\PYGZam{}}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{    }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{MarkerArray}\PYG{+w}{ }\PYG{n}{visuals}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{visuals}\PYG{p}{.}\PYG{n}{markers}\PYG{p}{.}\PYG{n}{resize}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n+nf}{av1}\PYG{p}{(}\PYG{n}{visuals}\PYG{p}{.}\PYG{n}{markers}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]);}
+\PYG{+w}{    }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{\PYGZam{}}\PYG{+w}{ }\PYG{n+nf}{av2}\PYG{p}{(}\PYG{n}{visuals}\PYG{p}{.}\PYG{n}{markers}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]);}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av1\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{ns}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}AVs\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{stamp}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Time}\PYG{p}{();}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{type}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{::}\PYG{n}{MESH\PYGZus{}RESOURCE}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{mesh\PYGZus{}resource}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}package://two\PYGZus{}drones\PYGZus{}pkg/mesh/quadrotor.dae\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{action}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{visualization\PYGZus{}msgs}\PYG{o}{::}\PYG{n}{Marker}\PYG{o}{::}\PYG{n}{ADD}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{pose}\PYG{p}{.}\PYG{n}{orientation}\PYG{p}{.}\PYG{n}{w}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{scale}\PYG{p}{.}\PYG{n}{x}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{scale}\PYG{p}{.}\PYG{n}{y}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{scale}\PYG{p}{.}\PYG{n}{z}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{a}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{r}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.25}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{g}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.52}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{b}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{1.0}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av1}\PYG{p}{.}\PYG{n}{lifetime}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{Duration}\PYG{p}{(}\PYG{l+m+mf}{1.0}\PYG{p}{);}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n}{av1}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{p}{.}\PYG{n}{header}\PYG{p}{.}\PYG{n}{frame\PYGZus{}id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}av2\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{p}{.}\PYG{n}{ns}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}AVs\PYGZdq{}}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{p}{.}\PYG{n}{id}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mi}{1}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{r}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.8}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{g}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.4}\PYG{p}{;}
+\PYG{+w}{    }\PYG{n}{av2}\PYG{p}{.}\PYG{n}{color}\PYG{p}{.}\PYG{n}{b}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+m+mf}{0.26}\PYG{p}{;}
+
+\PYG{+w}{    }\PYG{c+c1}{// Trails}
+\PYG{+w}{    }\PYG{n}{visuals}\PYG{p}{.}\PYG{n}{markers}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{av1trail}\PYG{p}{.}\PYG{n}{getMarker}\PYG{p}{());}
+\PYG{+w}{    }\PYG{n}{visuals}\PYG{p}{.}\PYG{n}{markers}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{av2trail}\PYG{p}{.}\PYG{n}{getMarker}\PYG{p}{());}
+\PYG{+w}{    }\PYG{n}{visuals}\PYG{p}{.}\PYG{n}{markers}\PYG{p}{.}\PYG{n}{push\PYGZus{}back}\PYG{p}{(}\PYG{n}{av2trail\PYGZus{}rel}\PYG{p}{.}\PYG{n}{getMarker}\PYG{p}{());}
+\PYG{+w}{    }\PYG{n}{markers\PYGZus{}pub}\PYG{p}{.}\PYG{n}{publish}\PYG{p}{(}\PYG{n}{visuals}\PYG{p}{);}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}
+\PYG{p}{\PYGZcb{};}
+
+\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n+nf}{main}\PYG{p}{(}\PYG{k+kt}{int}\PYG{+w}{ }\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{k+kt}{char}\PYG{o}{**}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{  }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{init}\PYG{p}{(}\PYG{n}{argc}\PYG{p}{,}\PYG{+w}{ }\PYG{n}{argv}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s}{\PYGZdq{}plots\PYGZus{}publisher\PYGZus{}node\PYGZdq{}}\PYG{p}{);}
+\PYG{+w}{  }\PYG{n}{PlotsPublisherNode}\PYG{+w}{ }\PYG{n}{node}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n}{ros}\PYG{o}{::}\PYG{n}{spin}\PYG{p}{();}
+\PYG{+w}{  }\PYG{k}{return}\PYG{+w}{ }\PYG{l+m+mi}{0}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}
