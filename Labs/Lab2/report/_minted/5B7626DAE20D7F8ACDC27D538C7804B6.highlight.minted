@@ -1,5 +1,0 @@
-\begin{MintedVerbatim}[commandchars=\\\{\}]
-\PYG{n+nb}{echo}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}source /opt/ros/noetic/setup.bash\PYGZdq{}}\PYG{+w}{ }\PYGZgt{}\PYGZgt{}\PYG{+w}{ }\PYGZti{}/.bashrc
-\PYG{n+nb}{source}\PYG{+w}{ }\PYGZti{}/.bashrc
-sudo\PYG{+w}{ }apt\PYG{+w}{ }install\PYG{+w}{ }python3\PYGZhy{}rosdep\PYG{+w}{ }python3\PYGZhy{}rosinstall\PYG{+w}{ }python3\PYGZhy{}rosinstall\PYGZhy{}generator\PYG{+w}{ }python3\PYGZhy{}vcstool\PYG{+w}{ }build\PYGZhy{}essential\PYG{+w}{ }python3\PYGZhy{}catkin\PYGZhy{}tools\PYG{+w}{ }python\PYGZhy{}is\PYGZhy{}python3
-\end{MintedVerbatim}

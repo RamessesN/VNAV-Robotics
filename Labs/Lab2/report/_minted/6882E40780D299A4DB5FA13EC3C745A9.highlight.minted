@@ -1,0 +1,5 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+mkdir\PYG{+w}{ }\PYGZhy{}p\PYG{+w}{ }\PYGZti{}/vnav\PYGZus{}ws/src
+\PYG{n+nb}{cd}\PYG{+w}{ }\PYGZti{}/vnav\PYGZus{}ws/
+catkin\PYG{+w}{ }init
+\end{MintedVerbatim}

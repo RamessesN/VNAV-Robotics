@@ -110,12 +110,12 @@ The experiment involves setting up the \textit{ROS} environment, creating and ma
 %----------------------------------------------------------------------------------------
 \subsection{Part I}
 \subsubsection{Objective}
-The objective of this section is to set up the \textit{ROS} environment on the Ubuntu 24.04 operating system, including the installation of necessary packages and configuration of a functional workspace.
+To set up the \textit{ROS} environment on the \textit{Ubuntu 24.04} operating system, including the installation of essential packages and the configuration of a functional Catkin workspace.
 
 \subsubsection{Methodology}
-The original method for installing \textit{ROS Noetic} was as follows:
+The initial approach for installing \textit{ROS Noetic} was as follows:
 \begin{enumerate}
-    \item Add the \textit{ROS} package sources and install \textit{ROS}:
+    \item Add the \textit{ROS} package sources and install \textit{ROS Noetic}:
     \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
@@ -123,28 +123,32 @@ sudo apt update
 sudo apt install ros-noetic-desktop-full
     \end{minted}
 
-    \item Configure the \textit{ROS} environment:
+    \item Configure the \textit{ROS} environment and install additional dependencies:
     \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
 source ~/.bashrc
-sudo apt install python3-rosdep python3-rosinstall python3-rosinstall-generator python3-vcstool build-essential python3-catkin-tools python-is-python3
+sudo apt install python3-rosdep python3-rosinstall python3-rosinstall-generator \
+python3-vcstool build-essential python3-catkin-tools python-is-python3
     \end{minted}
 
-    \item Initialize \textit{rosdep}:
+    \item Initialize \textit{rosdep} to enable dependency management:
     \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 sudo rosdep init
 rosdep update
     \end{minted}
 \end{enumerate}
 
-However, the above method is not fully compatible with \textit{Ubuntu 24.04}. Therefore, an alternative approach using the \textit{shrike} repository was adopted, which proved successful:
+However, the above method is not fully compatible with \textit{Ubuntu 24.04}.  
+To address this, an alternative installation procedure using the \textit{Shrike} repository was adopted, which provided a successful setup.
+
 \begin{enumerate}
-    \item Clone the \href{https://github.com/Minoic-Intelligence/shrike.git}{\textit{shrike}} repository from GitHub:
+    \item Clone the \href{https://github.com/Minoic-Intelligence/shrike.git}{\textit{Shrike}} repository from GitHub:
     \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 git clone git@github.com:Minoic-Intelligence/shrike.git
     \end{minted}
 
-    \item Follow the instructions provided in the \textit{shrike} repository to complete the installation:
+    \item Follow the instructions provided in the \textit{Shrike} repository to complete the installation.  
+    The resulting terminal output is shown in Figure~\ref{fig:ros_noetic_installation}.
     \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 ./scripts/install_ubuntu24.sh
 ./src/catkin/bin/catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
@@ -162,30 +166,32 @@ source ./install_isolated/setup.bash
     \begin{minipage}[b]{0.48\textwidth}
         \includegraphics[width=\textwidth]{./source/img/partI_2.png}
     \end{minipage}
-    \caption{Installation and configuration of \textit{ROS Noetic} on \textit{Ubuntu 24.04}}
+    \caption{Installation of \textit{ROS Noetic} on \textit{Ubuntu 24.04}}
     \label{fig:ros_noetic_installation}
 \end{figure}
 
 \subsubsection{Discussion}
-Installing \textit{ROS Noetic} on \textit{Ubuntu 24.04} presents challenges due to compatibility issues with the standard installation procedure. 
-By leveraging the \textit{shrike} repository, which provides customized scripts tailored for this specific operating system version, the installation was completed successfully. 
-This process underscores the importance of adapting installation methods to the target environment and utilizing community-maintained resources when standard approaches fail.
+Installing \textit{ROS Noetic} on \textit{Ubuntu 24.04} presents several challenges due to incompatibilities between the standard Noetic packages and the latest system libraries.  
+By utilizing the \textit{Shrike} repository—which provides customized build scripts tailored for Ubuntu 24.04—the installation process was completed successfully.  
+This outcome highlights the necessity of adapting traditional installation procedures to evolving system environments and demonstrates the value of community-maintained solutions when official support is unavailable.
+
 %----------------------------------------------------------------------------------------
 \subsection{Part II}
 \subsubsection{Objective}
-The goal of this section is to deepen understanding of the \textit{ROS} communication infrastructure by implementing publisher and subscriber nodes, exploring topic-based message exchange, and visualizing the inter-node topology. 
-This lays the foundation for modular, event-driven robotic behavior by:
+To deepen the understanding of the \textit{ROS} communication framework by implementing publisher and subscriber nodes, exploring topic-based message exchange, and visualizing the inter-node topology. 
+This experiment establishes the foundation for modular, event-driven robotic behavior through:
 \begin{enumerate}
-    \item Implementing \textit{ROS} nodes that publish and subscribe to custom messages.
+    \item Implementing \textit{ROS} nodes that publish and subscribe to custom message types.
     \item Demonstrating data flow between nodes via topics and verifying correct message delivery.
-    \item Utilizing diagnostic and visualization tools (such as {\tt rqt\_graph}) to inspect the connectivity of \textit{ROS} nodes and topics.
-    \item Ensuring that the workspace is properly configured to build, launch, and manage multiple nodes within a \textit{ROS} ecosystem.
+    \item Utilizing diagnostic and visualization tools (such as {\tt rqt\_graph}) to examine node–topic connectivity.
+    \item Ensuring the workspace is properly configured to build, launch, and manage multiple nodes within a \textit{ROS} ecosystem.
 \end{enumerate}
 
 \subsubsection{Methodology}
 \begin{itemize}
-    \item \textbf{\textit{ROS} Master} \\
-    Start the \textit{ROS} Master with the command: 
+    \item \textbf{\textit{ROS} Master} \\[0.2em]
+    Start the \textit{ROS} Master using the following command.  
+    The resulting output is shown in Figure~\ref{fig:ros_master}.
     \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 roscore
     \end{minted}
@@ -197,30 +203,32 @@ roscore
 rosrun turtlesim turtlesim_node
         \end{minted}
 
-        \item Query the running nodes via:
+        \item List active nodes using:
         \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 rosnode list
         \end{minted}
 
-        \item Launch the \textit{turtle\_teleop\_key} node to control the turtle using the keyboard:
+        \item Launch the \textit{turtle\_teleop\_key} node to control the turtle with keyboard input:
         \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 rosrun turtlesim turtle_teleop_key
         \end{minted}
+
+        \item The corresponding runtime output is illustrated in Figure~\ref{fig:ros_nodes}.
     \end{enumerate}
 
     \item \textbf{\textit{ROS} Topics}
     \begin{enumerate}
-        \item Visualize running nodes and topics with:
+        \item Visualize the communication graph of running nodes and topics:
         \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 rosrun rqt_graph rqt_graph
         \end{minted}
 
-        \item Monitor the velocity commands sent to the turtle:
+        \item Monitor velocity commands sent to the turtle in real time:
         \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 rostopic echo /turtle1/cmd_vel
         \end{minted}
 
-        \item Run the \textit{C++} sample
+        \item Create a simple \textit{C++} example node:
         \begin{minted}[fontsize=\footnotesize,breaklines,linenos,frame=single]{cpp}
 #include <ros/ros.h>
 
@@ -237,13 +245,15 @@ int main(int argc, char** argv) {
     return 0;
 }
         \end{minted}
-        To compile and run this code using \textit{Shrike}, follow these steps:
+
+        To compile and execute this example using \textit{Shrike}, follow these steps:
         \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 cd ~/shrike/ros_ws/src
 catkin_create_pkg ros_sample roscpp std_msgs
         \end{minted}
+
         The resulting workspace structure is:
-        \begin{verbatim}
+        \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 - ros_ws/
   - src/
     - ros_sample/
@@ -252,8 +262,9 @@ catkin_create_pkg ros_sample roscpp std_msgs
       - package.xml
       - src/
         - ros_sample.cpp
-        \end{verbatim}
-        Replace \textit{example\_node.cpp} with \textit{ros\_sample.cpp} and update \textit{CMakeLists.txt} as follows:
+        \end{minted}
+
+        Replace \textit{example\_node.cpp} with \textit{ros\_sample.cpp} and update the \textit{CMakeLists.txt} file as follows:
         \begin{minted}[fontsize=\footnotesize,breaklines,frame=single]{cpp}
 cmake_minimum_required(VERSION 3.0.2)
 project(ros_sample)
@@ -272,6 +283,7 @@ include_directories(
 add_executable(ros_sample_node src/ros_sample.cpp)
 target_link_libraries(ros_sample_node ${catkin_LIBRARIES})
         \end{minted}
+
         Build and source the workspace:
         \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 cd ~/shrike/ros_ws
@@ -279,52 +291,61 @@ catkin_make_isolated --install -DCMAKE_BUILD_TYPE=Release
 source ~/shrike/ros_ws/devel_isolated/setup.bash
 rosrun ros_sample ros_sample_node
         \end{minted}
-        Verify the node is running with \textit{rosnode list}.
 
-        \item \textit{TF} Tools
+        Verify that the node is active using \texttt{rosnode list}.  
+        The corresponding results are shown in Figure~\ref{fig:ros_topics}.
+
+        \item \textbf{\textit{TF} Tools}
         \begin{itemize}
             \item Launch the Turtle TF demo:
             \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 roslaunch turtle_tf turtle_tf_demo.launch
             \end{minted}
-            \textit{Note}: On Ubuntu 24.04 with \textit{Shrike}, older Noetic packages rely on Python 2, but only Python 3 is installed. To fix:
+
+            \textit{Note:} On Ubuntu 24.04 with \textit{Shrike}, older Noetic packages may depend on Python 2, while only Python 3 is installed.  
+            To resolve this compatibility issue, create a symbolic link:
             \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 sudo ln -s /usr/bin/python3 /usr/bin/python
             \end{minted}
 
-            \item Visualize TF tree using:
+            \item Visualize the TF tree using:
             \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 rosrun rqt_tf_tree rqt_tf_tree
             \end{minted}
-            This shows three frames: \textit{world} (parent), \textit{turtle1}, and \textit{turtle2}.
+            The visualization shows three coordinate frames: \textit{world} (parent), \textit{turtle1}, and \textit{turtle2}.
 
-            \item Inspect transforms with:
+            \item Inspect transformations in real time:
             \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
 rosrun tf tf_echo /turtle1 /turtle2
             \end{minted}
 
-            \item Run RViz:
-            \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
-LIBGL_ALWAYS_SOFTWARE=1 rviz
-            \end{minted}
-            Software rendering is required because RViz depends on OpenGL, which may not be fully supported in virtual environments.
+            \item The resulting output is illustrated in Figure~\ref{fig:tf_tools}.
         \end{itemize}
 
-        \item Modify \textit{view\_frames} script for \textit{Python 3.x} compatibility:
-        \begin{minted}[fontsize=\footnotesize,breaklines,frame=single]{python}
+        \item \textbf{Using \textit{RViz}} \\[0.2em]
+        Run the following command to launch \textit{RViz}:
+        \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+LIBGL_ALWAYS_SOFTWARE=1 rviz
+        \end{minted}
+        Software rendering is required because \textit{RViz} relies on OpenGL, which may not be fully supported in virtualized environments.  
+        The visualization result is shown in Figure~\ref{fig:rviz}.
+    \end{enumerate}
+
+    \textit{Notice:} Modify the \textit{view\_frames} script for Python 3.x compatibility:
+    \begin{minted}[fontsize=\footnotesize,breaklines,frame=single]{python}
 try:
-    vstr = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0]
+    vstr = subprocess.Popen(args, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT).communicate()[0]
     vstr = vstr.decode('utf-8')
 except OSError as ex:
-    print("Warning: Could not execute `dot -V`.  Is graphviz installed?")
+    print("Warning: Could not execute `dot -V`. Is graphviz installed?")
     sys.exit(-1)
 
 v = distutils.version.StrictVersion('2.16')
 r = re.compile(r".*version (\d+\.?\d*)")
 print(vstr)
 m = r.search(vstr)
-        \end{minted}
-    \end{enumerate}
+    \end{minted}
 \end{itemize}
 
 \subsubsection{Observations}
@@ -333,8 +354,8 @@ m = r.search(vstr)
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.6\textwidth]{./source/img/partII_1.png}
-        \caption{ROS Master status}
-        \label{fig:ros_master_observation}
+        \caption{ROS Master}
+        \label{fig:ros_master}
     \end{figure}
 
     \item \textit{ROS} Nodes
@@ -363,8 +384,8 @@ m = r.search(vstr)
                 \caption*{rosnode list output}
             \end{minipage}
         \end{minipage}
-        \caption{ROS nodes status}
-        \label{fig:ros_nodes_observation}
+        \caption{ROS nodes}
+        \label{fig:ros_nodes}
     \end{figure}
 
     \item \textit{ROS} Topics
@@ -405,58 +426,115 @@ m = r.search(vstr)
             \includegraphics[width=0.6\textwidth]{./source/img/partIII_5.png}
             \caption*{Roslaunch output}
         \end{minipage}
-        \caption{ROS topics observation}
-        \label{fig:ros_topics_observation}
+        \caption{ROS topics}
+        \label{fig:ros_topics}
     \end{figure}
 
     \begin{figure}[H]
         \centering
-        \begin{minipage}[H]{0.48\textwidth}
+        \begin{minipage}[b]{0.48\textwidth}
             \centering
             \includegraphics[width=\textwidth]{./source/img/partIII_6.png}
             \caption*{(a) rqt\_tf\_tree output}
         \end{minipage}
         \hfill
-        \begin{minipage}[H]{0.48\textwidth}
+        \begin{minipage}[b]{0.48\textwidth}
             \centering
             \includegraphics[width=\textwidth]{./source/img/partIII_7.png}
             \caption*{(b) tf\_echo output}
         \end{minipage}
-        \caption*{(b) TF tools observation}
-        \label{fig:tf_tools_observation}
+        \caption{TF tools}
+        \label{fig:tf_tools}
     \end{figure}
 
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.6\textwidth]{./source/img/partIII_8.png}
-        \caption{RViz output}
-        \label{fig:rviz_output}
+        \caption{RViz}
+        \label{fig:rviz}
     \end{figure}
 \end{itemize}
 
 \subsubsection{Discussion}
-This section demonstrates the fundamental principles of communication and visualization within the \textit{ROS} ecosystem. 
-By implementing publisher and subscriber nodes and observing the resulting message flows through \textit{rqt\_graph} and \textit{rostopic echo}, it becomes evident how \textit{ROS} topics facilitate modular and decoupled inter-node communication. 
-The ability to monitor live message data allows developers to verify correct behavior and quickly identify misconfigurations or runtime errors.
+This section demonstrates the core principles of inter-node communication and system visualization within the \textit{ROS} framework.  
+By implementing publisher and subscriber nodes and observing message flow using \textit{rqt\_graph} and \textit{rostopic echo}, it becomes clear how topic-based communication enables modular and decoupled node interaction.  
+The ability to monitor live message streams allows developers to validate correct behavior and quickly identify configuration or runtime issues.
 
-The use of \textit{TF} frames further highlights the importance of coordinate transformations in robotic systems. 
-The hierarchical relationship between \textit{world}, \textit{turtle1}, and \textit{turtle2} frames emphasizes how spatial relationships are managed and broadcast across the \textit{ROS} network. 
-Tools such as \textit{rqt\_tf\_tree} and \textit{tf\_echo} provide intuitive visualization and debugging capabilities, reinforcing the understanding of frame relationships and motion propagation.
+The use of \textit{TF} frames further illustrates the importance of coordinate transformation management in robotic systems.  
+The hierarchical relationship among the \textit{world}, \textit{turtle1}, and \textit{turtle2} frames highlights how spatial relationships are maintained and broadcast across the \textit{ROS} network.  
+Tools such as \textit{rqt\_tf\_tree} and \textit{tf\_echo} provide intuitive means of visualizing and debugging frame hierarchies, reinforcing understanding of kinematic relationships and transformation propagation.
 
-Running RViz in a virtualized environment illustrated practical considerations in deploying \textit{ROS} visualization tools. 
-The necessity to force software rendering with \texttt{LIBGL\_ALWAYS\_SOFTWARE=1} underscores how hardware limitations or OpenGL compatibility issues can affect 3D visualization. 
-This reinforces the broader lesson that deployment environments can significantly influence system behavior and must be accounted for during development and testing.
+Running \textit{RViz} in a virtualized environment emphasizes practical considerations for deploying visualization tools.  
+The need to enforce software rendering with \texttt{LIBGL\_ALWAYS\_SOFTWARE=1} underscores how hardware acceleration and OpenGL support directly affect performance and usability.
 
 %----------------------------------------------------------------------------------------
 \subsection{Part III}
 \subsubsection{Objective}
-% TODO: Write the objective of Part III.
+To utilize \textit{TF} to control the movement of drones.
 
 \subsubsection{Methodology}
-% TODO: Write the methodology of Part III.
+\begin{enumerate}
+    \item \textbf{Setting up the workspace} \\
+    First, create a Catkin workspace named \textit{vnav\_ws} under the home directory:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+mkdir -p ~/vnav_ws/src
+cd ~/vnav_ws/
+catkin init
+    \end{minted}
+
+    The output should appear as shown in Figure~\ref{fig:catkin_init_build}.  
+    Next, copy the \textit{two\_drones\_pkg} package into the \textit{src} folder:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+cp -a /source_path/two_drones_pkg ~/vnav_ws/src
+    \end{minted}
+
+    Then, build the workspace using:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+catkin build
+    \end{minted}
+
+    The build output is shown in Figure~\ref{fig:catkin_init_build}.  
+    After the build completes, source the setup file to refresh the environment:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+source devel/setup.bash
+    \end{minted}
+
+    Finally, launch \textit{ROS} to visualize the static drone scene in \textit{RViz}:
+    \begin{minted}[fontsize=\footnotesize,breaklines]{bash}
+roslaunch two_drones_pkg two_drones.launch static:=True
+    \end{minted}
+
+    After adding the \textit{TF} display, three colored axes will appear for each coordinate frame, as illustrated in Figure~\ref{fig:two_drones_pkg}.  
+    Remember to save the RViz configuration once the setup is complete.
+
+    \item 
+\end{enumerate}
 
 \subsubsection{Observations}
-% TODO: Write the observations of Part III.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./source/img/partIV_1.png}
+        \caption*{(a) catkin init}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{./source/img/partIV_2.png}
+        \caption*{(b) catkin build}
+    \end{minipage}
+    \caption{catkin init \& build}
+    \label{fig:catkin_init_build}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{./source/img/partIV_3.png}
+    \caption{Two drones}
+    \label{fig:two_drones_pkg}
+\end{figure}
 
 \subsubsection{Discussion}
 % TODO: Write the discussion of Part III.

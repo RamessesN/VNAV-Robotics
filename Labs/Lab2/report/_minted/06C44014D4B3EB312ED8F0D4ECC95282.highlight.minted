@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYGZhy{}\PYG{+w}{ }ros\PYGZus{}ws/
+\PYG{+w}{  }\PYGZhy{}\PYG{+w}{ }src/
+\PYG{+w}{    }\PYGZhy{}\PYG{+w}{ }ros\PYGZus{}sample/
+\PYG{+w}{      }\PYGZhy{}\PYG{+w}{ }CMakeLists.txt
+\PYG{+w}{      }\PYGZhy{}\PYG{+w}{ }include/
+\PYG{+w}{      }\PYGZhy{}\PYG{+w}{ }package.xml
+\PYG{+w}{      }\PYGZhy{}\PYG{+w}{ }src/
+\PYG{+w}{        }\PYGZhy{}\PYG{+w}{ }ros\PYGZus{}sample.cpp
+\end{MintedVerbatim}
