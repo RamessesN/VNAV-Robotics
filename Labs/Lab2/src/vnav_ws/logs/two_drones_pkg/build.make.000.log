@@ -1,5 +1,5 @@
-[ 50%] [32mBuilding CXX object CMakeFiles/plots_publisher_node.dir/src/plots_publisher_node.cpp.o[0m
 [ 50%] [32mBuilding CXX object CMakeFiles/frames_publisher_node.dir/src/frames_publisher_node.cpp.o[0m
+[ 50%] [32mBuilding CXX object CMakeFiles/plots_publisher_node.dir/src/plots_publisher_node.cpp.o[0m
 [ 75%] [32m[1mLinking CXX executable /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab2/src/vnav_ws/devel/.private/two_drones_pkg/lib/two_drones_pkg/frames_publisher_node[0m
 [ 75%] Built target frames_publisher_node
 [100%] [32m[1mLinking CXX executable /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab2/src/vnav_ws/devel/.private/two_drones_pkg/lib/two_drones_pkg/plots_publisher_node[0m

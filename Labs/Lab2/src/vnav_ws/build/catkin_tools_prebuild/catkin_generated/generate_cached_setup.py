@@ -12,7 +12,7 @@ try:
     from catkin.environment_cache import generate_environment_script
 except ImportError:
     # search for catkin package in all workspaces and prepend to path
-    for workspace in '/opt/anaconda3/envs/ros_env'.split(';'):
+    for workspace in '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab2/src/vnav_ws/devel;/opt/anaconda3/envs/ros_env'.split(';'):
         python_path = os.path.join(workspace, 'lib/python3.9/site-packages')
         if os.path.isdir(os.path.join(python_path, 'catkin')):
             sys.path.insert(0, python_path)

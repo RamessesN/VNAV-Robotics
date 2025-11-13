@@ -49,7 +49,7 @@
 \newcommand{\studentname}{Yuwei ZHAO}
 \newcommand{\studentnumber}{23020036096}
 \newcommand{\labgroup}{Group \#31}
-\newcommand{\labdate}{2025-11-12}
+\newcommand{\labdate}{2025-11-14}
 \newcommand{\course}{Robotics Integration Group Project I}
 \newcommand{\labtitle}{Lab 2 Report}
 
@@ -91,12 +91,12 @@
 
 %----------------------------------------------------------------------------------------
 \begin{abstract}
-This report presents the setup and experimentation process of Lab 2. 
-The primary objective of this lab is to install and configure the Robot Operating System (\textit{ROS}) environment, establish a working ROS workspace and gain hands-on experience with ROS nodes, topics, and message communication. 
-Through a series of practical exercises, the lab introduces core \textit{ROS} concepts such as node creation, publisher–subscriber mechanisms, and visualization using \textit{rqt\_graph} and \textit{roscore}. 
-The experiment provides a foundational understanding of how \textit{ROS} enables modular and distributed robotics software development.
+This report documents the setup and experimentation undertaken in Lab 2. 
+The primary objectives are to install and configure the Robot Operating System (\textit{ROS}) environment on Ubuntu, establish a functioning Catkin workspace, and gain practical experience with core ROS communication mechanisms. 
+Through a sequence of hands-on tasks, the lab introduces essential ROS concepts such as node creation, publisher-subscriber communication, topic monitoring, and system visualization using tools like {\tt rqt\_graph} and {\tt roscore}. 
+The experiment provides a foundational understanding of how ROS facilitates modular, distributed robotics software development.  
 
-See Resources on \href{https://github.com/RamessesN/Robotics_MIT}{git@github.com:RamessesN/Robotics\_MIT}.
+See Resources on \href{https://github.com/RamessesN/Robotics_MIT}{github.com/RamessesN/Robotics\_MIT}.
 \end{abstract}
 
 %----------------------------------------------------------------------------------------
@@ -364,24 +364,24 @@ m = r.search(vstr)
         \begin{minipage}[b]{\textwidth}
             \begin{minipage}[b]{0.35\textheight}
                 \includegraphics[width=\textwidth]{./source/img/partII_2.png}
-                \caption*{Turtlesim node running}
+                \caption*{(a) Turtlesim node running}
             \end{minipage}
             \hfill
             \begin{minipage}[b]{0.25\textheight}
                 \includegraphics[width=\textwidth]{./source/img/partII_3.png}
-                \caption*{rosnode list output}
+                \caption*{(b) rosnode list output}
             \end{minipage}
         \end{minipage}
         \vfill
         \begin{minipage}[b]{\textwidth}
             \begin{minipage}[b]{0.35\textheight}
                 \includegraphics[width=\textwidth]{./source/img/partII_4.png}
-                \caption*{Turtle teleop node running}
+                \caption*{(c) Turtle teleop node running}
             \end{minipage}
             \hfill
             \begin{minipage}[b]{0.25\textheight}
                 \includegraphics[width=\textwidth]{./source/img/partII_5.png}
-                \caption*{rosnode list output}
+                \caption*{(d) rosnode list output}
             \end{minipage}
         \end{minipage}
         \caption{ROS nodes}
@@ -396,13 +396,13 @@ m = r.search(vstr)
             \begin{minipage}[b]{0.25\textheight}
                 \centering
                 \includegraphics[width=\textwidth]{./source/img/partIII_1.png}
-                \caption*{rqt\_graph output}
+                \caption*{(a) rqt\_graph output}
             \end{minipage}
             \hfill
             \begin{minipage}[b]{0.35\textheight}
                 \centering
                 \includegraphics[width=\textwidth]{./source/img/partIII_2.png}
-                \caption*{Velocity topic output}
+                \caption*{(b) Velocity topic output}
             \end{minipage}
         \end{minipage}
         \vfill
@@ -411,20 +411,20 @@ m = r.search(vstr)
             \begin{minipage}[b]{0.48\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{./source/img/partIII_3.png}
-                \caption*{ROS node running}
+                \caption*{(c) ROS node running}
             \end{minipage}
             \hfill
             \begin{minipage}[b]{0.48\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{./source/img/partIII_4.png}
-                \caption*{rosnode list output}
+                \caption*{(d) rosnode list output}
             \end{minipage}
         \end{minipage}
         \vfill
         \begin{minipage}[b]{\textwidth}
             \centering
             \includegraphics[width=0.6\textwidth]{./source/img/partIII_5.png}
-            \caption*{Roslaunch output}
+            \caption*{(e) Roslaunch output}
         \end{minipage}
         \caption{ROS topics}
         \label{fig:ros_topics}
