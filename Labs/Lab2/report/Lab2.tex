@@ -685,7 +685,7 @@ tf2_ros::TransformListener tf_listener{tf_buffer};
 
         $\therefore WLOG x_p^1 = \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}$
 
-        $\therefore y_p^1 = z_p^1 \times x_p^1 = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 0 & \\ \frac{2}{\sqrt{5}} & -\frac{2}{\sqrt{1}} \\ 1 & 0 & 0 \end{vmatrix} = \begin{bmatrix} 0 \\ -\frac{1}{\sqrt{5}} \\ -\frac{2}{\sqrt{5}} \end{bmatrix}$
+        $\therefore y_p^1 = z_p^1 \times x_p^1 = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 0 & \frac{2}{\sqrt{5}} & -\frac{2}{\sqrt{1}} \\ 1 & 0 & 0 \end{vmatrix} = \begin{bmatrix} 0 \\ -\frac{1}{\sqrt{5}} \\ -\frac{2}{\sqrt{5}} \end{bmatrix}$
 
         $\therefore R_p^1 = [x_p^1 | y_p^1 | z_p^1] = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -\frac{1}{\sqrt{5}} & \frac{2}{\sqrt{5}} \\ 0 & \frac{2}{\sqrt{5}} & -\frac{1}{\sqrt{5}}\end{bmatrix}$.
 
@@ -814,13 +814,13 @@ tf2_ros::TransformListener tf_listener{tf_buffer};
 \subsubsection{Observations}
 \begin{figure}[H]
     \centering
-    \begin{minipage}[b]{0.48\textwidth}
+    \begin{minipage}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./source/img/partIV_1.png}
         \caption*{(a) catkin init}
     \end{minipage}
     \hfill
-    \begin{minipage}[b]{0.48\textwidth}
+    \begin{minipage}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth]{./source/img/partIV_2.png}
         \caption*{(b) catkin build}
