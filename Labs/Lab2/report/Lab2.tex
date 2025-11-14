@@ -21,6 +21,9 @@
 \setlength{\headheight}{15pt}
 \addtolength{\topmargin}{-2.5pt}
 
+\usepackage{amssymb}
+\usepackage{amsmath,amssymb,amsfonts}
+
 \usepackage{silence}
 \WarningFilter{gensymb}{Not defining}
 
@@ -624,20 +627,105 @@ tf2_ros::TransformListener tf_listener{tf_buffer};
 
     \item \textbf{Mathematical derivations}
     \begin{itemize}
-        \item In the problem formulation ,we mentioned that AV2’s trajectory is an arc of parabola in the $x$-$z$  plane of the world frame. Can you prove this statement?
-        % TODO: 
+        \item In the problem formulation ,we mentioned that AV2’s trajectory is an arc of parabola in the $x$-$z$  plane of the world frame. Can you prove this statement? \\ [1em]
+        \textbf{Solution:} \\
+        For AV2, its $o_2^\omega = \begin{bmatrix} sin(t) \\ 0 \\ cos(2t) \end{bmatrix}$. 
+        
+        By $cos(2t) = 1-2sin^2(t)$, we have $z = 1-2x^2$.
 
-        \item Compute $o_2^1(t)$ , i.e., the position of AV2 relative to AV1’s body frame as a function of $t$ .
-        % TODO
+        That's why the trajectory of AV2 is an arc of parabola in the $x$-$z$ plane.
 
-        \item Show that $o_2^1(t)$  describes a planar curve and find the equation of its plane $\Pi$.
-        % TODO
+        \item Compute $o_2^1(t)$ , i.e., the position of AV2 relative to AV1’s body frame as a function of $t$ . \\ [1em]
+        \textbf{Solution:} \\
+        We have $o_2^1(t) = R_1^\omega(t)^T \cdot (o_2^w(t) - o_1^w(t))$, where $R_1^\omega(t)^T$ means the rotation matirx from AV1's body frame to the world frame, $o_2^w(t) - o_1^w(t)$ means the vector pointing from AV1 to AV2.
+        
+        $R_1^\omega(t)^T = \begin{bmatrix} x_1^\omega \\ y_1^\omega \\ z_1^\omega \end{bmatrix}$.
+        
+        $\because z_1 \parallel z_\omega$
+        $\therefore z_\omega = \begin{bmatrix}0\\0\\1\end{bmatrix}$.
 
-        \item Rewrite the above trajectory explicitly using a 2D frame of reference $(x_p, y_p)$ on the plane found before. Try to ensure that the curve is centered at the origin of this 2D frame and that $x_p$ , $y_p$ are axes of symmetry for the curve.
-        % TODO
+        $\because y_1 \text{ is tangent to the trajectory of AV1}$
+        $\therefore \frac{d(o_1^\omega)}{dt} = \begin{bmatrix}-\sin t \\ \cos t \\ 0 \end{bmatrix}$.
 
-        \item Using the expression of $o_2^p(t)$ , prove that the trajectory of AV2 relative to AV1 is an ellipse and compute the lengths of its semi-axes.
-        % TODO
+        $\because \sqrt{(-\sin t)^2 + (\cos t)^2} = 1$
+        $\therefore y_1^\omega = \begin{bmatrix}-\sin t \\ \cos t \\ 0\end{bmatrix}$.
+
+        $\because x_1^\omega \text{ follows the right-hand rule}$
+        $\therefore x_1^\omega = y_1^\omega \times z_1^\omega = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ -\sin t & \cos t & 0 \\ 0 & 0 & 1 \end{vmatrix} = \begin{bmatrix} \cos t \\ \sin t \\ 0 \end{bmatrix}$.
+
+        $\therefore R_1^\omega = [x_1^\omega | x_2^\omega | x_3^\omega] = \begin{bmatrix} cos(t) & -sin(t) & 0 \\ sin(t) & cos(t) 0 \\ 0 & 0 & 1 \end{bmatrix}$.
+        
+        $\therefore o_2^1(t) = R_1^\omega(t)^T \cdot (o_2^w(t) - o_1^w(t)) \\
+        = \begin{bmatrix} cos(t) & sin(t) & 0 \\ -sin(t) & cos(t) & 0 \\ 0 & 0 & 1 \end{bmatrix} \cdot \begin{bmatrix} sin(t) - cos(t) \\ -sin(t) \\ cos(2t) \end{bmatrix} \\
+        = \begin{bmatrix} sin(t)\cdot cos(t) - 1 \\  -sin^2(t) \\ cos(2t)\end{bmatrix}$.
+
+        \item Show that $o_2^1(t)$  describes a planar curve and find the equation of its plane $\Pi$. \\ [1em]
+        \textbf{Solution:} \\
+        From the previous question, we have $o_2^1(t) = \begin{bmatrix} sin(t)\cdot cos(t) - 1 \\ -sin^2(t) \\ cos(2t) \end{bmatrix}$.
+        
+        $\because cos(2t) = 1 - 2sin^2(t)$
+        $\therefore z_2^1 = 1 + 2y_2^1$
+
+        That's $\Pi: 2y - z + 1 = 0$.
+
+        \item Rewrite the above trajectory explicitly using a 2D frame of reference $(x_p, y_p)$ on the plane found before. Try to ensure that the curve is centered at the origin of this 2D frame and that $x_p$ , $y_p$ are axes of symmetry for the curve. \\ [1em]
+        \textbf{Proof:} \\
+        Assume that there is a new coordinate \textit{P}, which center is $P^1 = \begin{bmatrix} -1 \\ -\frac{1}{2} \\ 0 \end{bmatrix}$.
+        
+        For translation matrix, we have \\
+        $T(t) = \begin{bmatrix} sin(t)\cdot cos(t) - 1 \\ -sin^2(t) \\ cos(2t) \end{bmatrix} - \begin{bmatrix} -1 \\ -\frac{1}{2} \\ 0 \end{bmatrix} = \begin{bmatrix} sin(t)\cdot cos(t) \\ -sin^2(t) + \frac{1}{2} \\ cos(2t) \end{bmatrix}$
+        
+        For rotation matrix, we have \\
+        $\because \Pi: 2y - z + 1 = 0$
+        $\therefore normal line: n = \begin{bmatrix} 0 \\ 2 \\ -1 \end{bmatrix}$
+        
+        $\therefore z_p^1 = \frac{1}{\sqrt{5} \cdot \begin{bmatrix} 0 \\ 2 \\ -1 \end{bmatrix}}$.
+
+        $\because \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix} \times \begin{bmatrix} 0 \\ 2 \\ 1 \end{bmatrix} = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 1 & 0 & 0 \\ 0 & 2 & 1 \end{vmatrix} = 0$
+
+        $\therefore WLOG x_p^1 = \begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}$
+
+        $\therefore y_p^1 = z_p^1 \times x_p^1 = \begin{vmatrix} \mathbf{i} & \mathbf{j} & \mathbf{k} \\ 0 & \\ \frac{2}{\sqrt{5}} & -\frac{2}{\sqrt{1}} \\ 1 & 0 & 0 \end{vmatrix} = \begin{bmatrix} 0 \\ -\frac{1}{\sqrt{5}} \\ -\frac{2}{\sqrt{5}} \end{bmatrix}$
+
+        $\therefore R_p^1 = [x_p^1 | y_p^1 | z_p^1] = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -\frac{1}{\sqrt{5}} & \frac{2}{\sqrt{5}} \\ 0 & \frac{2}{\sqrt{5}} & -\frac{1}{\sqrt{5}}\end{bmatrix}$.
+
+        $\therefore o_2^P(t) = R_1^P \cdot T(t) = \begin{bmatrix} 1 & 0 & 0 \\ 0 & -\frac{1}{\sqrt{5}} & \frac{2}{\sqrt{5}} \\ 0 & \frac{2}{\sqrt{5}} & -\frac{1}{\sqrt{5}} \end{bmatrix} \cdot \begin{bmatrix} sin(t) \cdot cos(t) \\ -sin^2(t) + \frac{1}{2} \\ cos(2t) \end{bmatrix} \\ = \begin{bmatrix} \frac{1}{2} sin(2t) \\ -\frac{\sqrt{5}}{2} cos(2t) \\ 0 \end{bmatrix}$.
+
+        That's the trajectory is under the $(x_P, y_P)$ 2D-coordinate, which
+        \begin{equation}
+            \begin{cases}
+                x_P(t) = \frac{1}{2} sin(2t) \\
+                y_p(t) = -\frac{\sqrt{5}}{2} cos(2t)
+            \end{cases}
+        \end{equation}
+
+        \item Using the expression of $o_2^p(t)$ , prove that the trajectory of AV2 relative to AV1 is an ellipse and compute the lengths of its semi-axes. \\ [1em]
+        \textbf{Solution:} \\
+        From the previous question, we have 
+        \begin{equation}
+            \begin{cases}
+                x_p(t) = \frac{1}{2} sin(2t) \\
+                y_p(t) = -\frac{\sqrt{5}}{2} cos(2t)
+            \end{cases}
+        \end{equation}
+        \begin{equation}
+            \Rightarrow
+            \begin{cases}
+                sin(2t) = 2x_p(t) \\
+                cos(2t) = -\frac{2}{\sqrt{5}} y_p(t)
+            \end{cases}
+        \end{equation}
+        $\therefore 4x_P^2(t) + \frac{4}{5} y_p^2(t) = 1$
+
+        That's $\frac{x_p^2}{\frac{1}{4}} + \frac{y_p^2}{\frac{5}{4}} = 1$
+
+        \begin{equation}
+            \therefore
+            \begin{cases}
+                x_p-semiperiod: a = \frac{1}{2} \\
+                y_p-semiperiod: b = \frac{\sqrt{5}}{2}
+            \end{cases}
+        \end{equation}
     \end{itemize}
 
     \item \textbf{More properties of quaternions}
