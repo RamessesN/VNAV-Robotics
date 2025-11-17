@@ -104,34 +104,45 @@ See Resources on \href{https://github.com/RamessesN/Robotics_MIT}{github.com/Ram
 %----------------------------------------------------------------------------------------
 \section{Procedure}
 %----------------------------------------------------------------------------------------
-\subsection{Part I}
-\subsubsection{Objective}
+\subsection{Individual Work}
+\subsubsection{Transformations in Practice}
+\begin{enumerate}
+    \item MESSAGE VS. TF
+    \begin{itemize}
+        \item Assume we have an incoming \textit{geometry\_msgs::Quaternion quat\_msg} that holds the pose of our robot. 
+        We need to save it in an already defined \textit{tf2::Quaternion quat\_tf} for further calculations. 
+        Write one line of C++ code to accomplish this task.
 
-\subsubsection{Methodology}
+        \item Assume we have just estimated our robot’s newest rotation and it’s saved in a variable called \textit{quat\_tf} of type \textit{tf2::Quaternion}. 
+        Write one line of C++ code to convert it to a \textit{geometry\_msgs::Quaternion} type. 
+        Use \textit{quat\_msg} as the name of the new variable.
 
-\subsubsection{Observations}
+        \item If you just want to know the scalar value of a \textit{tf2::Quaternion}, what member function will you use?
+    \end{itemize}
 
-\subsubsection{Discussion}
+    \item CONVERSION
+    \begin{itemize}
+        \item Assume you have a \textit{tf2::Quaternion quat\_t}. 
+        How to extract the yaw component of the rotation with just one function call?
+
+        \item Assume you have a \textit{geometry\_msgs::Quaternion quat\_msg}. How to you convert it to an Eigen 3-by-3 matrix? 
+        Refer to \href{https://docs.ros.org/en/jade/api/tf2_eigen/html/index.html}{this} for possible functions. You probably need two function calls for this.
+    \end{itemize}
+\end{enumerate}
+
+\subsubsection{Modelling and control of UAVs}
+\begin{enumerate}
+    \item STRUCTURE OF QUADROTORS
+    \item CONTROL OF QUADROTORS
+\end{enumerate}
 
 %----------------------------------------------------------------------------------------
-\subsection{Part II}
-\subsubsection{Objective}
-
-\subsubsection{Methodology}
-
-\subsubsection{Observations}
-
-\subsubsection{Discussion}
-
-%----------------------------------------------------------------------------------------\subsection{Part III}
-\subsection{Part III}
-\subsubsection{Objective}
-
-\subsubsection{Methodology}
-
-\subsubsection{Observations}
-
-\subsubsection{Discussion}
+\subsection{Team Work}
+\subsubsection{Trajectory tracking for UAVs}
+\subsubsection{Launching the TESSE simulator with ROS bridge}
+\subsubsection{Implement the controller}
+\subsubsection{Simulator conventions}
+\subsubsection{Geometric controller for the UAV}
 
 %----------------------------------------------------------------------------------------
 \section{Reflection and Analysis}
