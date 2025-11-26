@@ -52,7 +52,8 @@
 
   set heading(numbering: "1.1")
   show heading.where(level: 1): set block(above: 2em, below: 1.2em)
-  show heading.where(level: 2): set block(above: 1.5em, below: 0.8em)
+  show heading.where(level: 2): set block(above: 1.2em, below: 1.2em)
+  show heading.where(level: 3): set block(above: 1.2em, below: 1.2em)
   
   show raw.where(block: true): block.with(
     fill: luma(245),
@@ -97,7 +98,7 @@
 
 /**************   Introduction   **************/
 = Introduction
-// (Empty in source)
+// TODO
 
 /**************   Procedure   **************/
 = Procedure
@@ -108,36 +109,77 @@
 
 + *MESSAGE VS. TF*
   - *Assume we have an incoming `geometry_msgs::Quaternion quat_msg` that holds the pose of our robot. We need to save it in an already defined `tf2::Quaternion quat_tf` for further calculations. Write one line of C++ code to accomplish this task.* \
-    
-    *Solution*: \
-    To convert a `geometry_msgs::Quaternion` into a `tf2::Quaternion`, simply initialize the latter with the x, y, z, w components of the incoming message:
-    
     ```cpp
-    quat_tf = tf2::Quaternion(quat_msg.x, quat_msg.y, quat_msg.z, quat_msg.w);
+    tf2::fromMsg(quat_msg, quat_tf);
     ```
 
+    More specifically, we can find the official documentation of `fromMsg()` at #link("https://docs.ros.org/en/noetic/api/tf2_geometry_msgs/html/c++/namespacetf2.html#a2fdf91676912e510c0002aa66dde2800")[this page]:
+
     #figure(
-      image("../source/img/tf2_Quaternion.png", width: 60%),
+      image("../source/img/from_msg.png", width: 100%),
       caption: [tf2 Quaternion doc]
-    ) <fig:tf2_doc>
+    ) <fig:tf2_fromMsg_doc>
 
   - *Assume we have just estimated our robot’s newest rotation and it’s saved in a variable called `quat_tf` of type `tf2::Quaternion`. Write one line of C++ code to convert it to a `geometry_msgs::Quaternion` type. Use `quat_msg` as the name of the new variable.* \
-    
-    *Solution*:
     ```cpp
     geometry_msgs::Quaternion quat_msg = tf2::toMsg(quat_tf);
     ```
 
-  - If you just want to know the scalar value of a `tf2::Quaternion`, what member function will you use?
+    More specifically, we can find the official documentation of `toMsg()` in the same #link("https://docs.ros.org/en/noetic/api/tf2_geometry_msgs/html/c++/namespacetf2.html#a2fdf91676912e510c0002aa66dde2800")[link] as `fromMsg()`:
+
+    #figure(
+      image("../source/img/to_msg.png", width: 100%),
+      caption: [geometry_msgs Quaternion doc]
+    ) <fig:tf2_toMsg_doc>
+
+  - *If you just want to know the scalar value of a `tf2::Quaternion`, what member function will you use?*
+  ```cpp
+  double scalar = quat_tf.getW();
+  ```
+
+  More specifically, we find the official documentation of `getW()` #link("https://docs.ros.org/en/noetic/api/tf2/html/classtf2_1_1Quaternion.html#af21a6d7d4d7f29476307456a0cb020cb")[here]:
+
+  #figure(
+    image("../source/img/get_w.png", width: 100%),
+    caption: [Quaternion get_w doc]
+  ) <fig:quaternion_getW_doc>
 
 + *CONVERSION*
-  - Assume you have a `tf2::Quaternion quat_t`. How to extract the yaw component of the rotation with just one function call?
-  
-  - Assume you have a `geometry_msgs::Quaternion quat_msg`. How to you convert it to an Eigen 3-by-3 matrix? Refer to #link("https://docs.ros.org/en/jade/api/tf2_eigen/html/index.html")[this] for possible functions. You probably need two function calls for this.
+  - *Assume you have a `tf2::Quaternion quat_t`. How to extract the yaw component of the rotation with just one function call?*
+    ```cpp
+    double yaw = tf2::getYaw(quat_t);
+    ```
+
+    More specifically, the doc of `getYaw()` is shown at #link("https://docs.ros.org/en/noetic/api/tf2/html/namespacetf2.html")[this page]:
+
+    #figure(
+      image("../source/img/get_yaw.png", width: 100%),
+      caption: [Quaternion get_yaw doc]
+    ) <fig:quaternion_getYaw_doc>
+
+  - *Assume you have a `geometry_msgs::Quaternion quat_msg`. How to you convert it to an Eigen 3-by-3 matrix? Refer to #link("https://docs.ros.org/en/jade/api/tf2_eigen/html/index.html")[this] for possible functions. You probably need two function calls for this.*
+    ```cpp
+    #include <tf2_eigen/tf2_eigen.h>
+
+    Eigen::Quaterniond eigen_quat;
+
+    // The first function to call
+    tf2::fromMsg(quat_msg, eigen_quat);
+    
+    // The second function to call
+    Eigen::Matrix3d eigen_mat3 = eigen_quat.toRotationMatrix();
+    ```
+
+    More specifically, the doc of `toRotationMatrix()` can be found #link("https://libeigen.gitlab.io/eigen/docs-5.0/classEigen_1_1QuaternionBase.html#a8cf07ab9875baba2eecdd62ff93bfc3f")[here]:
+
+    #figure(
+      image("../source/img/to_rotation_matrix.png", width: 100%),
+      caption: [Eigen toRotationMatrix doc]
+    ) <fig:eigen_to_rotation_matrix_doc>
 
 === Modelling and control of UAVs
-+ STRUCTURE OF QUADROTORS
-+ CONTROL OF QUADROTORS
++ *STRUCTURE OF QUADROTORS*
++ *CONTROL OF QUADROTORS*
 
 == Team Work
 === Trajectory tracking for UAVs
