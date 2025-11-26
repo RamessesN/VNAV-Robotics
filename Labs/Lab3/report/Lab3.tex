@@ -107,20 +107,35 @@ See Resources on \href{https://github.com/RamessesN/Robotics_MIT}{github.com/Ram
 \subsection{Individual Work}
 \subsubsection{Transformations in Practice}
 \begin{enumerate}
-    \item MESSAGE VS. TF
+    \item \textbf{MESSAGE VS. TF}
     \begin{itemize}
-        \item Assume we have an incoming \textit{geometry\_msgs::Quaternion quat\_msg} that holds the pose of our robot. 
+        \item \textbf{Assume we have an incoming \textit{geometry\_msgs::Quaternion quat\_msg} that holds the pose of our robot. 
         We need to save it in an already defined \textit{tf2::Quaternion quat\_tf} for further calculations. 
-        Write one line of C++ code to accomplish this task.
+        Write one line of C++ code to accomplish this task.} \\ [0.5em]
+        \textbf{Solution}:
+        To convert a \textit{geometry\_msgs::Quaternion} into a \textit{tf2::Quaternion}, simply initialize the latter with the x, y, z, w components of the incoming message:
+        \begin{minted}[fontsize=\footnotesize,breaklines]{cpp}
+quat_tf = tf2::Quaternion(quat_msg.x, quat_msg.y, quat_msg.z, quat_msg.w);
+        \end{minted}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.6\textwidth]{source/img/tf2_Quaternion.png}
+            \caption{\textit{tf2 Quaternion doc}}
+            \label{fig:tf2_quaternion_doc}
+        \end{figure}
 
-        \item Assume we have just estimated our robot’s newest rotation and it’s saved in a variable called \textit{quat\_tf} of type \textit{tf2::Quaternion}. 
+        \item \textbf{Assume we have just estimated our robot’s newest rotation and it’s saved in a variable called \textit{quat\_tf} of type \textit{tf2::Quaternion}. 
         Write one line of C++ code to convert it to a \textit{geometry\_msgs::Quaternion} type. 
-        Use \textit{quat\_msg} as the name of the new variable.
+        Use \textit{quat\_msg} as the name of the new variable.} \\ [0.5em]
+        \textbf{Solution}:
+        \begin{minted}[fontsize=\footnotesize,breaklines]{cpp}
+geometry_msgs::Quaternion quat_msg = tf2::toMsg(quat_tf);
+        \end{minted}
 
-        \item If you just want to know the scalar value of a \textit{tf2::Quaternion}, what member function will you use?
+        \item If you just want to know the scalar value of a \textit{tf2::Quaternion}, what member function will you use? \\ [0.5em]
     \end{itemize}
 
-    \item CONVERSION
+    \item \textbf{CONVERSION}
     \begin{itemize}
         \item Assume you have a \textit{tf2::Quaternion quat\_t}. 
         How to extract the yaw component of the rotation with just one function call?
