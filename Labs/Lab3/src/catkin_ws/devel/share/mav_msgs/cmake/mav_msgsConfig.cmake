@@ -1,0 +1,1 @@
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/.private/mav_msgs/share/mav_msgs/cmake/mav_msgsConfig.cmake

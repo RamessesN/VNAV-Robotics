@@ -1,0 +1,7 @@
+set(tesse_ros_bridge_SETUP_PY_SETUP_MODULE "distutils.core")
+set(tesse_ros_bridge_SETUP_PY_VERSION "0.0.1")
+set(tesse_ros_bridge_SETUP_PY_SCRIPTS "")
+set(tesse_ros_bridge_SETUP_PY_PACKAGES "tesse_ros_bridge;key_teleop")
+set(tesse_ros_bridge_SETUP_PY_PACKAGE_DIRS "src/tesse_ros_bridge;src/key_teleop")
+set(tesse_ros_bridge_SETUP_PY_MODULES "")
+set(tesse_ros_bridge_SETUP_PY_MODULE_DIRS "")

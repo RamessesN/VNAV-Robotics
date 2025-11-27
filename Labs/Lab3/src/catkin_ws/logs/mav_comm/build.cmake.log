@@ -1,0 +1,39 @@
+Not searching for unused variables given on the command line.
+[0mCMake Deprecation Warning at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+[0m
+[36m--[0m The C compiler identification is Clang 14.0.6
+[36m--[0m The CXX compiler identification is Clang 14.0.6
+[36m--[0m Detecting C compiler ABI info
+[36m--[0m Detecting C compiler ABI info - done
+[36m--[0m Check for working C compiler: /opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang - skipped
+[36m--[0m Detecting C compile features
+[36m--[0m Detecting C compile features - done
+[36m--[0m Detecting CXX compiler ABI info
+[36m--[0m Detecting CXX compiler ABI info - done
+[36m--[0m Check for working CXX compiler: /opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ - skipped
+[36m--[0m Detecting CXX compile features
+[36m--[0m Detecting CXX compile features - done
+[36m--[0m Using CATKIN_DEVEL_PREFIX: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/.private/mav_comm
+[36m--[0m Using CMAKE_PREFIX_PATH: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel;/opt/anaconda3/envs/ros_env
+[36m--[0m This workspace overlays: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel;/opt/anaconda3/envs/ros_env
+[36m--[0m Found PythonInterp: /opt/anaconda3/envs/ros_env/bin/python3.9 (found suitable version "3.9.15", minimum required is "3.9")
+[36m--[0m Using PYTHON_EXECUTABLE: /opt/anaconda3/envs/ros_env/bin/python3.9
+[36m--[0m Using default Python package layout
+[36m--[0m Found PY_em: /opt/anaconda3/envs/ros_env/lib/python3.9/site-packages/em.py
+[36m--[0m Using empy: /opt/anaconda3/envs/ros_env/lib/python3.9/site-packages/em.py
+[36m--[0m Using CATKIN_ENABLE_TESTING: ON
+[36m--[0m Call enable_testing()
+[36m--[0m Using CATKIN_TEST_RESULTS_DIR: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_comm/test_results
+[36m--[0m Found gtest: gtests will be built
+[36m--[0m Using Python nosetests: /opt/anaconda3/envs/ros_env/bin/nosetests-3.9
+[36m--[0m catkin 0.8.10
+[36m--[0m BUILD_SHARED_LIBS is on
+[36m--[0m Configuring done
+[36m--[0m Generating done
+[36m--[0m Build files have been written to: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_comm

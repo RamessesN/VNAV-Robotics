@@ -1,0 +1,1 @@
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/.private/ackermann_msgs/share/roseus/ros/ackermann_msgs/manifest.l

@@ -1,0 +1,331 @@
+The system is: Darwin - 25.1.0 - arm64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang 
+Build flags: -ftree-vectorize;-fPIC;-fPIE;-fstack-protector-strong;-O2;-pipe;-isystem;/opt/anaconda3/envs/ros_env/include
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is Clang, found in "/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/3.25.1/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ 
+Build flags: -ftree-vectorize;-fPIC;-fPIE;-fstack-protector-strong;-O2;-pipe;-stdlib=libc++;-fvisibility-inlines-hidden;-fmessage-length=0;-isystem;/opt/anaconda3/envs/ros_env/include
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is Clang, found in "/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/3.25.1/CompilerIdCXX/a.out"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7
+
+Run Build Command(s):/opt/anaconda3/envs/ros_env/bin/make -f Makefile cmTC_89f72/fast && /opt/anaconda3/envs/ros_env/bin/make  -f CMakeFiles/cmTC_89f72.dir/build.make CMakeFiles/cmTC_89f72.dir/build
+make[1]: Entering directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7'
+Building C object CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o
+/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang   -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk   -v -Wl,-v -MD -MT CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -c /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCCompilerABI.c
+clang version 14.0.6
+Target: arm64-apple-darwin20.0.0
+Thread model: posix
+InstalledDir: /opt/anaconda3/envs/ros_env/bin
+clang-14: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
+ (in-process)
+ "/opt/anaconda3/envs/ros_env/bin/clang-14" -cc1 -triple arm64-apple-macosx16.0.0 -Wundef-prefix=TARGET_OS_ -Werror=undef-prefix -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -funwind-tables=2 -target-sdk-version=26.1 -fcompatibility-qualified-id-block-type-checking -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +fp-armv8 -target-feature +neon -target-feature +crc -target-feature +crypto -target-feature +dotprod -target-feature +fp16fml -target-feature +ras -target-feature +lse -target-feature +rdm -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -fallow-half-arguments-and-returns -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=lldb -target-linker-version 609 -v -fcoverage-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7 -resource-dir /opt/anaconda3/envs/ros_env/lib/clang/14.0.6 -dependency-file CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -sys-header-deps -isystem /opt/anaconda3/envs/ros_env/include -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -O2 -fdebug-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7 -ferror-limit 19 -stack-protector 2 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fmax-type-align=16 -vectorize-loops -vectorize-slp -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -x c /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCCompilerABI.c
+clang -cc1 version 14.0.6 based upon LLVM 14.0.6 default target arm64-apple-darwin25.1.0
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+#include "..." search starts here:
+#include <...> search starts here:
+ /opt/anaconda3/envs/ros_env/include
+ /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)
+End of search list.
+Linking C executable cmTC_89f72
+/opt/anaconda3/envs/ros_env/bin/cmake -E cmake_link_script CMakeFiles/cmTC_89f72.dir/link.txt --verbose=1
+/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/ros_env/lib -L/opt/anaconda3/envs/ros_env/lib -v -Wl,-v CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -o cmTC_89f72 
+clang version 14.0.6
+Target: arm64-apple-darwin20.0.0
+Thread model: posix
+InstalledDir: /opt/anaconda3/envs/ros_env/bin
+ "/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld" -demangle -lto_library /opt/anaconda3/envs/ros_env/lib/libLTO.14.dylib -dynamic -arch arm64 -platform_version macos 16.0.0 26.1 -pie -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o cmTC_89f72 -L/opt/anaconda3/envs/ros_env/lib -search_paths_first -headerpad_max_install_names -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/ros_env/lib -v CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -lSystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a
+@(#)PROGRAM:ld  PROJECT:ld64-609
+BUILD 17:39:38 Mar 22 2023
+configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em (tvOS)
+Library search paths:
+	/opt/anaconda3/envs/ros_env/lib
+	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
+Framework search paths:
+	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/
+make[1]: Leaving directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/opt/anaconda3/envs/ros_env/include]
+    add: [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include]
+    add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+  end of search list found
+  collapse include dir [/opt/anaconda3/envs/ros_env/include] ==> [/opt/anaconda3/envs/ros_env/include]
+  collapse include dir [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include] ==> [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include]
+  collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+  implicit include dirs: [/opt/anaconda3/envs/ros_env/include;/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(arm64-apple-darwin20\.0\.0-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7]
+  ignore line: []
+  ignore line: [Run Build Command(s):/opt/anaconda3/envs/ros_env/bin/make -f Makefile cmTC_89f72/fast && /opt/anaconda3/envs/ros_env/bin/make  -f CMakeFiles/cmTC_89f72.dir/build.make CMakeFiles/cmTC_89f72.dir/build]
+  ignore line: [make[1]: Entering directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7']
+  ignore line: [Building C object CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang   -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk   -v -Wl -v -MD -MT CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -c /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCCompilerABI.c]
+  ignore line: [clang version 14.0.6]
+  ignore line: [Target: arm64-apple-darwin20.0.0]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/anaconda3/envs/ros_env/bin]
+  ignore line: [clang-14: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
+  ignore line: [ (in-process)]
+  ignore line: [ "/opt/anaconda3/envs/ros_env/bin/clang-14" -cc1 -triple arm64-apple-macosx16.0.0 -Wundef-prefix=TARGET_OS_ -Werror=undef-prefix -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -funwind-tables=2 -target-sdk-version=26.1 -fcompatibility-qualified-id-block-type-checking -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +fp-armv8 -target-feature +neon -target-feature +crc -target-feature +crypto -target-feature +dotprod -target-feature +fp16fml -target-feature +ras -target-feature +lse -target-feature +rdm -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -fallow-half-arguments-and-returns -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=lldb -target-linker-version 609 -v -fcoverage-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7 -resource-dir /opt/anaconda3/envs/ros_env/lib/clang/14.0.6 -dependency-file CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -sys-header-deps -isystem /opt/anaconda3/envs/ros_env/include -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -O2 -fdebug-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-1owmA7 -ferror-limit 19 -stack-protector 2 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fmax-type-align=16 -vectorize-loops -vectorize-slp -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -x c /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCCompilerABI.c]
+  ignore line: [clang -cc1 version 14.0.6 based upon LLVM 14.0.6 default target arm64-apple-darwin25.1.0]
+  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"]
+  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /opt/anaconda3/envs/ros_env/include]
+  ignore line: [ /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include]
+  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)]
+  ignore line: [End of search list.]
+  ignore line: [Linking C executable cmTC_89f72]
+  ignore line: [/opt/anaconda3/envs/ros_env/bin/cmake -E cmake_link_script CMakeFiles/cmTC_89f72.dir/link.txt --verbose=1]
+  ignore line: [/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl -search_paths_first -Wl -headerpad_max_install_names -Wl -pie -Wl -headerpad_max_install_names -Wl -dead_strip_dylibs -Wl -rpath /opt/anaconda3/envs/ros_env/lib -L/opt/anaconda3/envs/ros_env/lib -v -Wl -v CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -o cmTC_89f72 ]
+  ignore line: [clang version 14.0.6]
+  ignore line: [Target: arm64-apple-darwin20.0.0]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/anaconda3/envs/ros_env/bin]
+  link line: [ "/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld" -demangle -lto_library /opt/anaconda3/envs/ros_env/lib/libLTO.14.dylib -dynamic -arch arm64 -platform_version macos 16.0.0 26.1 -pie -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o cmTC_89f72 -L/opt/anaconda3/envs/ros_env/lib -search_paths_first -headerpad_max_install_names -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/ros_env/lib -v CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o -lSystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a]
+    arg [/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld] ==> ignore
+    arg [-demangle] ==> ignore
+    arg [-lto_library] ==> ignore, skip following value
+    arg [/opt/anaconda3/envs/ros_env/lib/libLTO.14.dylib] ==> skip value of -lto_library
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [arm64] ==> ignore
+    arg [-platform_version] ==> ignore
+    arg [macos] ==> ignore
+    arg [16.0.0] ==> ignore
+    arg [26.1] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-syslibroot] ==> ignore
+    arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_89f72] ==> ignore
+    arg [-L/opt/anaconda3/envs/ros_env/lib] ==> dir [/opt/anaconda3/envs/ros_env/lib]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-dead_strip_dylibs] ==> ignore
+    arg [-rpath] ==> ignore
+    arg [/opt/anaconda3/envs/ros_env/lib] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTC_89f72.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lSystem] ==> lib [System]
+    arg [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a] ==> lib [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a]
+  Library search paths: [;/opt/anaconda3/envs/ros_env/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+  Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a]
+  collapse library dir [/opt/anaconda3/envs/ros_env/lib] ==> [/opt/anaconda3/envs/ros_env/lib]
+  collapse library dir [/opt/anaconda3/envs/ros_env/lib] ==> [/opt/anaconda3/envs/ros_env/lib]
+  collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+  collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+  implicit libs: []
+  implicit objs: []
+  implicit dirs: [/opt/anaconda3/envs/ros_env/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+  implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63
+
+Run Build Command(s):/opt/anaconda3/envs/ros_env/bin/make -f Makefile cmTC_514ce/fast && /opt/anaconda3/envs/ros_env/bin/make  -f CMakeFiles/cmTC_514ce.dir/build.make CMakeFiles/cmTC_514ce.dir/build
+make[1]: Entering directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63'
+Building CXX object CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o
+/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++   -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk   -v -Wl,-v -MD -MT CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -c /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCXXCompilerABI.cpp
+clang version 14.0.6
+Target: arm64-apple-darwin20.0.0
+Thread model: posix
+InstalledDir: /opt/anaconda3/envs/ros_env/bin
+clang-14: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
+ (in-process)
+ "/opt/anaconda3/envs/ros_env/bin/clang-14" -cc1 -triple arm64-apple-macosx16.0.0 -Wundef-prefix=TARGET_OS_ -Werror=undef-prefix -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -funwind-tables=2 -target-sdk-version=26.1 -fcompatibility-qualified-id-block-type-checking -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +fp-armv8 -target-feature +neon -target-feature +crc -target-feature +crypto -target-feature +dotprod -target-feature +fp16fml -target-feature +ras -target-feature +lse -target-feature +rdm -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -fallow-half-arguments-and-returns -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=lldb -target-linker-version 609 -v -fcoverage-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63 -resource-dir /opt/anaconda3/envs/ros_env/lib/clang/14.0.6 -dependency-file CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isystem /opt/anaconda3/envs/ros_env/include -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -stdlib=libc++ -internal-isystem /opt/anaconda3/envs/ros_env/bin/../include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -O2 -fdeprecated-macro -fdebug-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63 -ferror-limit 19 -fvisibility-inlines-hidden -stack-protector 2 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -fmax-type-align=16 -vectorize-loops -vectorize-slp -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCXXCompilerABI.cpp
+clang -cc1 version 14.0.6 based upon LLVM 14.0.6 default target arm64-apple-darwin25.1.0
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"
+ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"
+#include "..." search starts here:
+#include <...> search starts here:
+ /opt/anaconda3/envs/ros_env/include
+ /opt/anaconda3/envs/ros_env/bin/../include/c++/v1
+ /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)
+End of search list.
+Linking CXX executable cmTC_514ce
+/opt/anaconda3/envs/ros_env/bin/cmake -E cmake_link_script CMakeFiles/cmTC_514ce.dir/link.txt --verbose=1
+/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/ros_env/lib -L/opt/anaconda3/envs/ros_env/lib -v -Wl,-v CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_514ce 
+clang version 14.0.6
+Target: arm64-apple-darwin20.0.0
+Thread model: posix
+InstalledDir: /opt/anaconda3/envs/ros_env/bin
+ "/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld" -demangle -lto_library /opt/anaconda3/envs/ros_env/lib/libLTO.14.dylib -dynamic -arch arm64 -platform_version macos 16.0.0 26.1 -pie -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o cmTC_514ce -L/opt/anaconda3/envs/ros_env/lib -search_paths_first -headerpad_max_install_names -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/ros_env/lib -v CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a
+@(#)PROGRAM:ld  PROJECT:ld64-609
+BUILD 17:39:38 Mar 22 2023
+configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em (tvOS)
+Library search paths:
+	/opt/anaconda3/envs/ros_env/lib
+	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
+Framework search paths:
+	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/
+make[1]: Leaving directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63'
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/opt/anaconda3/envs/ros_env/include]
+    add: [/opt/anaconda3/envs/ros_env/bin/../include/c++/v1]
+    add: [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include]
+    add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+  end of search list found
+  collapse include dir [/opt/anaconda3/envs/ros_env/include] ==> [/opt/anaconda3/envs/ros_env/include]
+  collapse include dir [/opt/anaconda3/envs/ros_env/bin/../include/c++/v1] ==> [/opt/anaconda3/envs/ros_env/include/c++/v1]
+  collapse include dir [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include] ==> [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include]
+  collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+  implicit include dirs: [/opt/anaconda3/envs/ros_env/include;/opt/anaconda3/envs/ros_env/include/c++/v1;/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(arm64-apple-darwin20\.0\.0-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63]
+  ignore line: []
+  ignore line: [Run Build Command(s):/opt/anaconda3/envs/ros_env/bin/make -f Makefile cmTC_514ce/fast && /opt/anaconda3/envs/ros_env/bin/make  -f CMakeFiles/cmTC_514ce.dir/build.make CMakeFiles/cmTC_514ce.dir/build]
+  ignore line: [make[1]: Entering directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63']
+  ignore line: [Building CXX object CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++   -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk   -v -Wl -v -MD -MT CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -c /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [clang version 14.0.6]
+  ignore line: [Target: arm64-apple-darwin20.0.0]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/anaconda3/envs/ros_env/bin]
+  ignore line: [clang-14: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
+  ignore line: [ (in-process)]
+  ignore line: [ "/opt/anaconda3/envs/ros_env/bin/clang-14" -cc1 -triple arm64-apple-macosx16.0.0 -Wundef-prefix=TARGET_OS_ -Werror=undef-prefix -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -emit-obj --mrelax-relocations -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -ffp-contract=on -fno-rounding-math -funwind-tables=2 -target-sdk-version=26.1 -fcompatibility-qualified-id-block-type-checking -fvisibility-inlines-hidden-static-local-var -target-cpu apple-m1 -target-feature +v8.5a -target-feature +fp-armv8 -target-feature +neon -target-feature +crc -target-feature +crypto -target-feature +dotprod -target-feature +fp16fml -target-feature +ras -target-feature +lse -target-feature +rdm -target-feature +rcpc -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-feature +sha2 -target-feature +aes -target-abi darwinpcs -fallow-half-arguments-and-returns -mllvm -treat-scalable-fixed-error-as-warning -debugger-tuning=lldb -target-linker-version 609 -v -fcoverage-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63 -resource-dir /opt/anaconda3/envs/ros_env/lib/clang/14.0.6 -dependency-file CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isystem /opt/anaconda3/envs/ros_env/include -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -stdlib=libc++ -internal-isystem /opt/anaconda3/envs/ros_env/bin/../include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include -internal-isystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include -O2 -fdeprecated-macro -fdebug-compilation-dir=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-6c3K63 -ferror-limit 19 -fvisibility-inlines-hidden -stack-protector 2 -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -fmax-type-align=16 -vectorize-loops -vectorize-slp -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/anaconda3/envs/ros_env/share/cmake-3.25/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [clang -cc1 version 14.0.6 based upon LLVM 14.0.6 default target arm64-apple-darwin25.1.0]
+  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/local/include"]
+  ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/Library/Frameworks"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /opt/anaconda3/envs/ros_env/include]
+  ignore line: [ /opt/anaconda3/envs/ros_env/bin/../include/c++/v1]
+  ignore line: [ /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/include]
+  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include]
+  ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks (framework directory)]
+  ignore line: [End of search list.]
+  ignore line: [Linking CXX executable cmTC_514ce]
+  ignore line: [/opt/anaconda3/envs/ros_env/bin/cmake -E cmake_link_script CMakeFiles/cmTC_514ce.dir/link.txt --verbose=1]
+  ignore line: [/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang++ -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -stdlib=libc++ -fvisibility-inlines-hidden -fmessage-length=0 -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl -search_paths_first -Wl -headerpad_max_install_names -Wl -pie -Wl -headerpad_max_install_names -Wl -dead_strip_dylibs -Wl -rpath /opt/anaconda3/envs/ros_env/lib -L/opt/anaconda3/envs/ros_env/lib -v -Wl -v CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_514ce ]
+  ignore line: [clang version 14.0.6]
+  ignore line: [Target: arm64-apple-darwin20.0.0]
+  ignore line: [Thread model: posix]
+  ignore line: [InstalledDir: /opt/anaconda3/envs/ros_env/bin]
+  link line: [ "/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld" -demangle -lto_library /opt/anaconda3/envs/ros_env/lib/libLTO.14.dylib -dynamic -arch arm64 -platform_version macos 16.0.0 26.1 -pie -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -o cmTC_514ce -L/opt/anaconda3/envs/ros_env/lib -search_paths_first -headerpad_max_install_names -pie -headerpad_max_install_names -dead_strip_dylibs -rpath /opt/anaconda3/envs/ros_env/lib -v CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a]
+    arg [/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-ld] ==> ignore
+    arg [-demangle] ==> ignore
+    arg [-lto_library] ==> ignore, skip following value
+    arg [/opt/anaconda3/envs/ros_env/lib/libLTO.14.dylib] ==> skip value of -lto_library
+    arg [-dynamic] ==> ignore
+    arg [-arch] ==> ignore
+    arg [arm64] ==> ignore
+    arg [-platform_version] ==> ignore
+    arg [macos] ==> ignore
+    arg [16.0.0] ==> ignore
+    arg [26.1] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-syslibroot] ==> ignore
+    arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_514ce] ==> ignore
+    arg [-L/opt/anaconda3/envs/ros_env/lib] ==> dir [/opt/anaconda3/envs/ros_env/lib]
+    arg [-search_paths_first] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-pie] ==> ignore
+    arg [-headerpad_max_install_names] ==> ignore
+    arg [-dead_strip_dylibs] ==> ignore
+    arg [-rpath] ==> ignore
+    arg [/opt/anaconda3/envs/ros_env/lib] ==> ignore
+    arg [-v] ==> ignore
+    arg [CMakeFiles/cmTC_514ce.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lc++] ==> lib [c++]
+    arg [-lSystem] ==> lib [System]
+    arg [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a] ==> lib [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a]
+  Library search paths: [;/opt/anaconda3/envs/ros_env/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+  Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/]
+  remove lib [System]
+  remove lib [/opt/anaconda3/envs/ros_env/lib/clang/14.0.6/lib/darwin/libclang_rt.osx.a]
+  collapse library dir [/opt/anaconda3/envs/ros_env/lib] ==> [/opt/anaconda3/envs/ros_env/lib]
+  collapse library dir [/opt/anaconda3/envs/ros_env/lib] ==> [/opt/anaconda3/envs/ros_env/lib]
+  collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+  collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+  implicit libs: [c++]
+  implicit objs: []
+  implicit dirs: [/opt/anaconda3/envs/ros_env/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib]
+  implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks]
+
+
+Performing C SOURCE FILE Test CMAKE_HAVE_LIBC_PTHREAD succeeded with the following output:
+Change Dir: /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-tWxy82
+
+Run Build Command(s):/opt/anaconda3/envs/ros_env/bin/make -f Makefile cmTC_2d710/fast && /opt/anaconda3/envs/ros_env/bin/make  -f CMakeFiles/cmTC_2d710.dir/build.make CMakeFiles/cmTC_2d710.dir/build
+make[1]: Entering directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-tWxy82'
+Building C object CMakeFiles/cmTC_2d710.dir/src.c.o
+/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang -DCMAKE_HAVE_LIBC_PTHREAD  -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -MD -MT CMakeFiles/cmTC_2d710.dir/src.c.o -MF CMakeFiles/cmTC_2d710.dir/src.c.o.d -o CMakeFiles/cmTC_2d710.dir/src.c.o -c /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-tWxy82/src.c
+Linking C executable cmTC_2d710
+/opt/anaconda3/envs/ros_env/bin/cmake -E cmake_link_script CMakeFiles/cmTC_2d710.dir/link.txt --verbose=1
+/opt/anaconda3/envs/ros_env/bin/arm64-apple-darwin20.0.0-clang -ftree-vectorize -fPIC -fPIE -fstack-protector-strong -O2 -pipe -isystem /opt/anaconda3/envs/ros_env/include  -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -Wl,-pie -Wl,-headerpad_max_install_names -Wl,-dead_strip_dylibs -Wl,-rpath,/opt/anaconda3/envs/ros_env/lib -L/opt/anaconda3/envs/ros_env/lib  CMakeFiles/cmTC_2d710.dir/src.c.o -o cmTC_2d710 
+make[1]: Leaving directory '/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/mav_system_msgs/CMakeFiles/CMakeScratch/TryCompile-tWxy82'
+
+
+Source file was:
+#include <pthread.h>
+
+static void* test_func(void* data)
+{
+  return data;
+}
+
+int main(void)
+{
+  pthread_t thread;
+  pthread_create(&thread, NULL, test_func, NULL);
+  pthread_detach(thread);
+  pthread_cancel(thread);
+  pthread_join(thread, NULL);
+  pthread_atfork(NULL, NULL, NULL);
+  pthread_exit(NULL);
+
+  return 0;
+}
+
+

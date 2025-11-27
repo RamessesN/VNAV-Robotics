@@ -1,0 +1,1 @@
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/.private/ackermann_msgs/share/gennodejs/ros/ackermann_msgs/msg/AckermannDriveStamped.js

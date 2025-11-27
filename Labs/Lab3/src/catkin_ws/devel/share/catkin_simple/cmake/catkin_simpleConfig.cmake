@@ -1,0 +1,1 @@
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/.private/catkin_simple/share/catkin_simple/cmake/catkin_simpleConfig.cmake

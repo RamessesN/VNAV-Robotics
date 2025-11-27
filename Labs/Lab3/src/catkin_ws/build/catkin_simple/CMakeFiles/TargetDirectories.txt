@@ -1,0 +1,13 @@
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/download_extra_data.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/tests.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/run_tests.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/clean_test_results.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/doxygen.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/_catkin_empty_exported_target.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/test.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/edit_cache.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/rebuild_cache.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/list_install_components.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/install.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/install/local.dir
+/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/build/catkin_simple/CMakeFiles/install/strip.dir

@@ -1,0 +1,8 @@
+prefix=/Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/install
+
+Name: tesse_ros_bridge
+Description: Description of tesse_ros_bridge
+Version: 0.0.1
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: message_runtime

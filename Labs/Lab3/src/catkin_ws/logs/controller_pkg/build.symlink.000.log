@@ -1,0 +1,5 @@
+Symlinking /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/lib/pkgconfig/controller_pkg.pc
+Symlinking /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/lib/controller_pkg/controller_node
+Symlinking /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/lib/controller_pkg/traj_publisher
+Symlinking /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/share/controller_pkg/cmake/controller_pkgConfig-version.cmake
+Symlinking /Users/stanley/Documents/COURSE/PROGRAMME/C_Family/Robotics_MIT/Labs/Lab3/src/catkin_ws/devel/share/controller_pkg/cmake/controller_pkgConfig.cmake

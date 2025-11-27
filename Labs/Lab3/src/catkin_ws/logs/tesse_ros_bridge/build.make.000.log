@@ -1,0 +1,63 @@
+[  0%] Built target _tesse_ros_bridge_generate_messages_check_deps_SceneRequestService
+[  0%] Built target tf_generate_messages_py
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_py
+[  0%] Built target nav_msgs_generate_messages_py
+[  0%] Built target mav_msgs_generate_messages_py
+[  0%] Built target ackermann_msgs_generate_messages_py
+[  0%] Built target tf_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target _tesse_ros_bridge_generate_messages_check_deps_ObjectSpawnRequestService
+[  0%] Built target _tesse_ros_bridge_generate_messages_check_deps_RepositionRequestService
+[  0%] Built target _tesse_ros_bridge_generate_messages_check_deps_CollisionStats
+[  0%] Built target sensor_msgs_generate_messages_cpp
+[  0%] Built target nav_msgs_generate_messages_cpp
+[  0%] Built target ackermann_msgs_generate_messages_cpp
+[  0%] Built target mav_msgs_generate_messages_cpp
+[  0%] Built target tf_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target sensor_msgs_generate_messages_eus
+[  0%] Built target nav_msgs_generate_messages_eus
+[  0%] Built target mav_msgs_generate_messages_eus
+[  0%] Built target ackermann_msgs_generate_messages_eus
+[  0%] Built target tf_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target nav_msgs_generate_messages_lisp
+[  0%] Built target sensor_msgs_generate_messages_lisp
+[  0%] Built target mav_msgs_generate_messages_lisp
+[  0%] Built target ackermann_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target tf_generate_messages_nodejs
+[  0%] Built target sensor_msgs_generate_messages_nodejs
+[  0%] Built target nav_msgs_generate_messages_nodejs
+[  0%] Built target mav_msgs_generate_messages_nodejs
+[  0%] Built target ackermann_msgs_generate_messages_nodejs
+[  4%] [34m[1mGenerating Python code from SRV tesse_ros_bridge/ObjectSpawnRequestService[0m
+[  8%] [34m[1mGenerating C++ code from tesse_ros_bridge/CollisionStats.msg[0m
+[ 13%] [34m[1mGenerating Python code from SRV tesse_ros_bridge/RepositionRequestService[0m
+[ 17%] [34m[1mGenerating Python from MSG tesse_ros_bridge/CollisionStats[0m
+[ 21%] [34m[1mGenerating EusLisp code from tesse_ros_bridge/CollisionStats.msg[0m
+[ 26%] [34m[1mGenerating Lisp code from tesse_ros_bridge/CollisionStats.msg[0m
+[ 30%] [34m[1mGenerating Javascript code from tesse_ros_bridge/CollisionStats.msg[0m
+[ 34%] [34m[1mGenerating Lisp code from tesse_ros_bridge/ObjectSpawnRequestService.srv[0m
+[ 39%] [34m[1mGenerating C++ code from tesse_ros_bridge/ObjectSpawnRequestService.srv[0m
+[ 43%] [34m[1mGenerating Javascript code from tesse_ros_bridge/ObjectSpawnRequestService.srv[0m
+[ 47%] [34m[1mGenerating EusLisp code from tesse_ros_bridge/ObjectSpawnRequestService.srv[0m
+[ 52%] [34m[1mGenerating Lisp code from tesse_ros_bridge/RepositionRequestService.srv[0m
+[ 56%] [34m[1mGenerating Lisp code from tesse_ros_bridge/SceneRequestService.srv[0m
+[ 60%] [34m[1mGenerating Javascript code from tesse_ros_bridge/RepositionRequestService.srv[0m
+[ 65%] [34m[1mGenerating Python code from SRV tesse_ros_bridge/SceneRequestService[0m
+[ 69%] [34m[1mGenerating EusLisp code from tesse_ros_bridge/RepositionRequestService.srv[0m
+[ 73%] [34m[1mGenerating EusLisp code from tesse_ros_bridge/SceneRequestService.srv[0m
+[ 73%] Built target tesse_ros_bridge_generate_messages_lisp
+[ 78%] [34m[1mGenerating Javascript code from tesse_ros_bridge/SceneRequestService.srv[0m
+[ 82%] [34m[1mGenerating C++ code from tesse_ros_bridge/RepositionRequestService.srv[0m
+[ 86%] [34m[1mGenerating EusLisp manifest code for tesse_ros_bridge[0m
+[ 86%] Built target tesse_ros_bridge_generate_messages_nodejs
+[ 91%] [34m[1mGenerating C++ code from tesse_ros_bridge/SceneRequestService.srv[0m
+[ 95%] [34m[1mGenerating Python srv __init__.py for tesse_ros_bridge[0m
+[100%] [34m[1mGenerating Python msg __init__.py for tesse_ros_bridge[0m
+[100%] Built target tesse_ros_bridge_generate_messages_py
+[100%] Built target tesse_ros_bridge_generate_messages_cpp
+[100%] Built target tesse_ros_bridge_generate_messages_eus
+[100%] Built target tesse_ros_bridge_generate_messages
