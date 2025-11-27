@@ -1,0 +1,12 @@
+Metadata-Version: 2.4
+Name: tesse
+Version: 0.1.2
+Summary: TESSE python interface
+License-File: LICENSE
+Requires-Dist: numpy>=1.16.0
+Requires-Dist: defusedxml>=0.6.0
+Requires-Dist: Pillow>=5.0.0
+Requires-Dist: enum34>=1.1.10
+Dynamic: license-file
+Dynamic: requires-dist
+Dynamic: summary
