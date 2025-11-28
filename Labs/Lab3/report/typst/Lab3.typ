@@ -44,6 +44,7 @@
 
   set math.mat(delim: "[")
   set math.vec(delim: "[")
+  set math.equation(numbering: "(1)")
 
   show link: set text(fill: rgb("0000FF"))
 
