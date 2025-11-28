@@ -46,6 +46,20 @@
   set math.vec(delim: "[")
   set math.equation(numbering: "(1)")
 
+  show ref: it => {
+    let el = it.element
+    if el != none and el.func() == math.equation {
+      let count = counter(math.equation).at(el.location())      
+
+      let num = numbering(el.numbering, ..count)
+
+      set text(fill: rgb("0000FF")) 
+      link(el.location(), num)
+    } else {
+      it
+    }
+  }
+
   show link: set text(fill: rgb("0000FF"))
 
   set par(
@@ -122,15 +136,15 @@ $ P(1) = 1, $ <3>*
 *with $P(t) in RR[t]$, i.e., $P(t)$ is a polynomial function in $t$ with real coefficients:
 $ P(t) = p_N t^N + p_(N-1) t^(N-1) + ... + p_1 t + p_0 $*
 
-*Note that because of constraint (@2) $P(0) = p_0 = 0$, and we can parametrize $P(t)$ without a scalar part $p_0$.*
+*Note that because of constraint @2 $P(0) = p_0 = 0$, and we can parametrize $P(t)$ without a scalar part $p_0$.*
 
-+ *Suppose we restrict $P(t) = p_1 t$ to be a polynomial of degree 1, what is the optimal solution of problem (@1)? What is the value of the cost function at the optimal solution?*
++ *Suppose we restrict $P(t) = p_1 t$ to be a polynomial of degree 1, what is the optimal solution of problem @1? What is the value of the cost function at the optimal solution?*
 
 + *Suppose now we allow $P(t)$ to have degree 2, i.e., $P(t) = p_2 t^2 + p_1 t$.*
 
-  - *Write $integral_0^1 (P^(\(1\))(t))^2 d t$, the cost function of problem (@1), as $p^T Q p$, where $p = vec(p_1, p_2)$ and $Q in S^2$ is a symmetric $2 crossmark 2$ matrix.*
+  - *Write $integral_0^1 (P^(\(1\))(t))^2 d t$, the cost function of problem @1, as $p^T Q p$, where $p = vec(p_1, p_2)$ and $Q in S^2$ is a symmetric $2 crossmark 2$ matrix.*
 
-  - *Write $P(1) = 1$, constraint (@3), as $A p = b$, where $A in RR^(1 crossmark 2)$ and $b in RR$.*
+  - *Write $P(1) = 1$, constraint @3, as $A p = b$, where $A in RR^(1 crossmark 2)$ and $b in RR$.*
 
   - *Solve the Quadratic Program (QP):
   $ min_p p^T Q p " " s.t. " " A p = b $ <5>*
@@ -138,12 +152,12 @@ $ P(t) = p_N t^N + p_(N-1) t^(N-1) + ... + p_1 t + p_0 $*
   *You can solve it by hand, or you can solve it using numerical QP solvers (e.g., you can easily use the `quadprog` function in Matlab). What is the optimal solution you get for $P(t)$, and what is the value of the cost function at the optimal solution? Are you able to get a lower cost by allowing $P(t)$ to have degree 2?*
 
 + *Now suppose we allow $P(t) = p_3 t^3 + p_2 t^2 + p_1 t$:*
-  - *Let $p = [p_1. p_2, p_3]^T$, write down $Q in S^3, A in RR^(1 crossmark 3), b in RR$ for QP (@5).*
+  - *Let $p = [p_1. p_2, p_3]^T$, write down $Q in S^3, A in RR^(1 crossmark 3), b in RR$ for QP @5.*
   - *Solve the QP, what optimal solution do you get? Do this example agree with the result we learned from Euler-Lagrange equation in class?*
 
-+ *Now suppose we are interested in adding one more constraint to problem (@1):
++ *Now suppose we are interested in adding one more constraint to problem @1:
 $ min_P(t)  integral_0^1 (P^(\(1\))(t))^2 d t, " " s.t. P(0) = 0, " " P(1) = 1, " " P^((1))(1) = -2 $ <6>
-Using the QP method above, find the optimal solution and optimal cost of problem (@6) in the case of:*
+Using the QP method above, find the optimal solution and optimal cost of problem @6 in the case of:*
   - *$P(t) = p_2 t^2 + p_1 t$, and*
   - *$P(t) = p_3 t^3 + p_2 t^2 + p_1 t$.*
 
