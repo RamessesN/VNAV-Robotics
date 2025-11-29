@@ -98,12 +98,16 @@
 
 /**************   Abstract   **************/
 #abstract[
+  Lab3 explores the fundamentals of rigid body transformations and the implementation of a geometric controller for a quadrotor UAV. It separated into the following two parts: *(1)* The individual part focuses on the practical manipulation of rotations using `tf2`, `geometry_msgs`, and `Eigen` libraries within the ROS ecosystem, alongside a theoretical analysis of quadrotor dynamics and drag compensation. *(2)* The collaborative component involves implementing a non-linear geometric controller on SE(3) to track dynamic trajectories. The system is integrated and validated using the TESSE Unity simulator, demonstrating the UAV's ability to follow a reference path effectively.
+
   See Resources on #link("https://github.com/RamessesN/Robotics_MIT")[github.com/RamessesN/Robotics_MIT].
 ]
 
 /**************   Introduction   **************/
 = Introduction
-// TODO
+Precise trajectory tracking is a fundamental challenge in UAV robotics due to the system's fast and underactuated dynamics. This laboratory aims to bridge the gap between theoretical control derivation and practical software implementation within the ROS1.
+
+The objectives of this report are threefold: *(1)* First, we practice handling rigid body transformations using `tf2` and `Eigen` libraries to ensure accurate state estimation. *(2)* Second, we analyze quadrotor dynamics, specifically examining the mixing matrix and drag force compensation. *(3)* Finally, the report details the implementation of a geometric tracking controller on the Special Euclidean group SE(3), based on the work of Lee et al. We integrate this controller into the MIT-TESSE simulation environment to validate its performance. The procedure demonstrates the complete workflow from mathematical modelling to C++ implementation, culminating in the successful tracking of a complex trajectory.
 
 /**************   Procedure   **************/
 = Procedure
