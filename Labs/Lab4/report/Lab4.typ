@@ -140,26 +140,115 @@ $ P(t) = p_N t^N + p_(N-1) t^(N-1) + ... + p_1 t + p_0 $*
 
 + *Suppose we restrict $P(t) = p_1 t$ to be a polynomial of degree 1, what is the optimal solution of problem @1? What is the value of the cost function at the optimal solution?*
 
+  $because P(t) = p_1 t$ \
+  Let $t = 1 therefore P(1) = p_1 dot 1 = p_1$ #sep \
+  $because P(1) = 1$
+  $therefore p_1 = 1$ \
+  $therefore "optimal solution:" P(t) = t$. #sep
+
+  $because P(t) = t$
+  $therefore P^(\(1\)) t = d / (d t) t = 1$ \
+  $therefore "Cost" = integral_0^1 (1)^2 d t = 1$. #sep
+
 + *Suppose now we allow $P(t)$ to have degree 2, i.e., $P(t) = p_2 t^2 + p_1 t$.*
 
   - *Write $integral_0^1 (P^(\(1\))(t))^2 d t$, the cost function of problem @1, as $p^T Q p$, where $p = vec(p_1, p_2)$ and $Q in S^2$ is a symmetric $2 crossmark 2$ matrix.*
 
+    $because P(t) = p_2 t^2 + p_1 t$ #sep
+    $therefore P^(\(1\))(t) = 2p_2 t + p_1$ \
+    $therefore "Cost" = integral_0^1 (2p_2 t + p_1)^2 d t = p_1^2 + 2 p_1 p_2 + 4/3 p_2^2$ #sep \
+    In order to write into a $2 crossmark 2$ matrix as $p^T Q p$, we have #sep \
+    $vec(p_1 \, p_2) dot mat(Q_11, Q_12; Q_21, Q_22) dot vec(p_1, p_2) = p_1^2 + 2 p_1 p_2 + 4/3 p_2^2$ #sep \
+    $therefore Q_(11) = 1, Q_(22) = 4/3 $ #sep \
+    $because Q_(12) = Q_(21)$ #sep $therefore 2Q_(12) = 2$ \
+    $therefore Q_(12) = Q_(21) = 1 => Q = mat(1, 1; 1, 4/3)$. #sep
+
   - *Write $P(1) = 1$, constraint @3, as $A p = b$, where $A in RR^(1 crossmark 2)$ and $b in RR$.*
+
+    $because P(1) = 1$ \
+    $therefore P(1) = p_2(1)^2 + P_1(1) = p_1 + p_2 = 1$ \
+    $because A p = b$ and $p = vec(p_1, p_2)$ #sep
+    $therefore A = vec(1 " " 1), b = 1$.
 
   - *Solve the Quadratic Program (QP):
   $ min_p p^T Q p " " s.t. " " A p = b $ <5>*
   
-  *You can solve it by hand, or you can solve it using numerical QP solvers (e.g., you can easily use the `quadprog` function in Matlab). What is the optimal solution you get for $P(t)$, and what is the value of the cost function at the optimal solution? Are you able to get a lower cost by allowing $P(t)$ to have degree 2?*
+    *You can solve it by hand, or you can solve it using numerical QP solvers (e.g., you can easily use the `quadprog` function in Matlab). What is the optimal solution you get for $P(t)$, and what is the value of the cost function at the optimal solution? Are you able to get a lower cost by allowing $P(t)$ to have degree 2?*
+
+    $because$ we have $min_p p^T Q p <=> limits(min)_(p_1, p_2)(p_1^2 + 2 p_1 p_2 + 4/3 p_2^2)$ \
+    and $A p = b <=> p_1 + p_2 = 1$ #sep \
+    Let $p_1 = 1 - p_2$ $therefore "Cost" = (1 - p_2)^2 + 2 (1 - p_2) p_2 + 4/3 p_2^2 = 1 + 1/3 p_2^2$ #sep \
+    In order to make `Cost` minimum
+    $=> cases(p_1 = 1, p_2 = 0) $ #sep
+    $therefore "Cost"_"minimal" = 1$. \
+    No, it remains the same value even though `P(t)` has degree 2. #sep
 
 + *Now suppose we allow $P(t) = p_3 t^3 + p_2 t^2 + p_1 t$:*
   - *Let $p = [p_1. p_2, p_3]^T$, write down $Q in S^3, A in RR^(1 crossmark 3), b in RR$ for QP @5.*
+
+    $because P(t) = p_3 t^3 + p_2 t^2 + p_1 t$ \
+    $therefore P_(t)^(\(1\)) = 3 p_3 t^2 + 2 p_2 t + p_1$ #sep \
+    $therefore [P_(t)^(\(1\))]^2 = 9 p_3^2 t^4 + 4 p_2^2 t^2 + p_1^2 + underbrace(12 p_2 p_3 t^3, p_2 p_3) + underbrace(6 p_1 p_3 t^1, p_1 p_3) + underbrace(4 p_1 p_2 t, p_1 p_2)$ #sep \
+    #set math.equation(numbering: none)
+    $therefore$ we have $ cases(
+      "item" p_3^2: integral_0^1 9 t^4 d t = 9/5,
+      "item" p_2^2: integral_0^1 4 t^2 d t = 4/3,
+      "item" p_1^2: integral_0^1 1 d t = 1,
+      "item" p_2 p_3: integral_0^1 12 t^3 d t = 3,
+      "item" p_1 p_3: integral_0^1 6 t^2 d t = 2,
+      "item" p_1 p_2: integral_0^1 4 t d t = 2
+    ) $
+    $therefore Q = mat(1, 1, 1; 1, 4/3, 3/2; 1, 3/2, 9/5)$ \
+    $because p_3(1)^3 + p_2(1)^2 + p_1(1) = 1 => 1 dot p_1 + 1 dot p_2 + 1 dot p_3 = 1$ #sep \
+    $therefore A = [1 " " 1 " " 1]," " b = 1$.
+
   - *Solve the QP, what optimal solution do you get? Do this example agree with the result we learned from Euler-Lagrange equation in class?*
+
+    From the above, we have the path that connects two points and minimizes the change in speed (energy) is always a straight line. That's regardless of the inclusion of higher-degree terms like $t^2 "or" t^3$, the optimization drives their coefficients to 0. The curve connecting the two points that minimizes the velocity cost is always a straight line. Consequently, the value of the cost function remains 1.
+    
+    #line(length: 100%, stroke: (dash: "dashed"))
+
+    Yes. By `Euler-Lagrange` equation, we have $(partial L) / (partial P) - d / (d t) (partial L) / (partial P') = 0$ \
+    Since $L = (P')^2$ #sep $therefore d / (d t) (2P') = 0 => P''(t) = 0$ #sep \ #sep
+    The condition $P''(t) = 0$ implies that the optimal function must be linear. The QP result is indeed a linear function, which confirms that the theroretical result derived from calculus of variations.
 
 + *Now suppose we are interested in adding one more constraint to problem @1:
 $ min_P(t)  integral_0^1 (P^(\(1\))(t))^2 d t, " " s.t. P(0) = 0, " " P(1) = 1, " " P^((1))(1) = -2 $ <6>
 Using the QP method above, find the optimal solution and optimal cost of problem @6 in the case of:*
   - *$P(t) = p_2 t^2 + p_1 t$, and*
   - *$P(t) = p_3 t^3 + p_2 t^2 + p_1 t$.*
+
+    *> Case I. If $P(t) = p_2 t^2 + p_1 t$,* \ #sep
+    #math.cases(
+      $"For" P(1) = 1: p_1 + p_2 = 1$,
+      $P^(\(1\))(1) = -2: p_1 + 2p_2 = -2$
+    ) \
+    $therefore$ we have #math.cases(
+      $p_1 = 4$,
+      $p_2 = -3$
+    ) #sep \
+    $therefore$ #math.cases(
+      $P(t) = -3t^2 + 4t$,
+      $"Cost" = p_1^2 + 2 p_1 p_2 + 4/3 p_2^2 = 4$
+    ) #sep
+
+    *> Case II. If $P(t) = p_3 t^3 + p_2 t^2 + p_1 t$,* \ #sep
+    #math.cases(
+      $"For" P(1) = 1: p_1 + p_2 + p_3 = 1$,
+      $P^(\(1\))(1) = -2: p_1 + 2p_2 + 3p_3 = -2$
+    ) \
+    $therefore$ #math.cases(
+      $p_1 = 4 + p_3$,
+      $p_2 = -3 - 2p_3$
+    ) #sep \
+    From @3, we have: $Q = mat(1, 1, 1; 1, 4/3, 3/2; 1, 3/2, 9/5)$ #sep \
+    $p = vec(4 + p_3, -3 - 2p_3, p_3) = underbrace(vec(4, -3, 0), p_"base") + p_3 underbrace(vec(1, -2, 1), d)$ #sep \
+    $"For" "Cost"(p_3) = A p_3^2 + B p_3 + C, "we have" cases(A = d^T Q d, B = 2p_"base"^T Q d)$ #sep \
+    $therefore Q d = mat(1, 1, 1; 1, 4/3, 3/2; 1, 3/2, 9/5) dot vec(1, -2, 1) = vec(0, -1/6, -1/5)$ #sep \
+    $therefore A = 2/15, " "B = 1$ #sep
+    $therefore "Cost" = 2/15 p_3^2 + p_3 + 4$ \
+    In order to make `Cost` minimum $=> p_3 = -15/4 => "Cost"_"minimal" = 17/8$. #sep
+    
 
 === Multi-segment trajectory optimization
 
