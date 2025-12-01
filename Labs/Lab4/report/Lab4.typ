@@ -218,7 +218,7 @@ Using the QP method above, find the optimal solution and optimal cost of problem
   - *$P(t) = p_2 t^2 + p_1 t$, and*
   - *$P(t) = p_3 t^3 + p_2 t^2 + p_1 t$.*
 
-    *> Case I. If $P(t) = p_2 t^2 + p_1 t$,* \ #sep
+    *#math.section Case I. If $P(t) = p_2 t^2 + p_1 t$,* \ #sep
     #math.cases(
       $"For" P(1) = 1: p_1 + p_2 = 1$,
       $P^(\(1\))(1) = -2: p_1 + 2p_2 = -2$
@@ -232,7 +232,7 @@ Using the QP method above, find the optimal solution and optimal cost of problem
       $"Cost" = p_1^2 + 2 p_1 p_2 + 4/3 p_2^2 = 4$
     ) #sep
 
-    *> Case II. If $P(t) = p_3 t^3 + p_2 t^2 + p_1 t$,* \ #sep
+    *#math.section Case II. If $P(t) = p_3 t^3 + p_2 t^2 + p_1 t$,* \ #sep
     #math.cases(
       $"For" P(1) = 1: p_1 + p_2 + p_3 = 1$,
       $P^(\(1\))(1) = -2: p_1 + 2p_2 + 3p_3 = -2$
@@ -249,7 +249,6 @@ Using the QP method above, find the optimal solution and optimal cost of problem
     $therefore "Cost" = 2/15 p_3^2 + p_3 + 4$ \
     In order to make `Cost` minimum $=> p_3 = -15/4 => "Cost"_"minimal" = 17/8$. #sep
     
-
 === Multi-segment trajectory optimization
 
 + *Assume our goal is to compute the minimum snap trajectory ($r = 4$) over $k$ segments. 
@@ -260,7 +259,47 @@ Using the QP method above, find the optimal solution and optimal cost of problem
     image("./source/img/trajOpt.png", width: 60%)
   )
 
+    $"Cost" = integral(x^(\(4\))(t))^2 d t => x^(\(2r\))(t) = 0 => x^(\(8\))(t) = 0$ \ #sep
+    *Step 1: Determine the number of Unknowns*
+
+    Given the cost function $"Cost" = integral (x^((4))(t))^2 d t$, the Euler-Lagrange equation yields the necessary condition:
+    #set math.equation(numbering: none)
+    $ x^((2r))(t) = 0 limits(=>)^(r=4) x^((8))(t) = 0 $
+    Integrating this equation *8 times*, we obtain a polynomial of degree $2r-1 = 7$:
+    $ P(t) = p_7 t^7 + p_6 t^6 + dots + p_1 t + p_0 $
+    $because$ Each segment has $N+1 = 8$ unknown coefficients and there are $k$ segments. \
+    $therefore$ Total Unknowns = $8k$, which means we need $8k$ constraints to solve for a unique solution. \
+    (1) For _Waypoint Constraints_: #sep \ 
+      For each segment $i$, the position at start $t_(i-1)$ and end $t_i$ is fixed. \
+      $therefore$ 2 constraints $times$ $k$ segments = $2k$ constraints. \
+    (2) For _Free Derivative Constraints_: #sep \
+      At the $(k-1)$ intermediate waypoints, the trajectory must be smooth. \
+      Continuity is required for derivatives up to $2r-2 = 6$ (i.e., $1^"st"$ to $6^"th"$ derivatives). \
+      $therefore$ 6 constraints $times$ $(k-1)$ points = $6(k - 1)$ constraints. \
+    (3) For _Fixed Derivative Constraints_: #sep \
+      At the start $t_0$ and end $t_k$ of the entire trajectory, we fix derivatives up to $r-1 = 3$ (Velocity, Acc, Jerk). \
+      $therefore$ $3$ (start) $+ 3$ (end) = $6$ constraints.
+
+    #line(length: 100%, stroke: (dash: "dashed"))
+
+    *> Proof: * \
+    $2k + 6(k - 1) + 6 = 8k$, which confirms that total number of constraints is $8k$.
+
 + *Can you extend the previous question to the case in which the cost functional minimizes the $r$-th derivative and we have $k$ segments?*
+
+  From the method above, we have $"Total number of constraints" = 2 r k$. \
+  Specifically, \
+  (1) For _Waypoint Constraints_: #sep \
+  $2k$ (Start and End positions for each segment). \
+  (2) For _Free Derivative Constraints_: #sep \
+   $(k - 1) dot (2r - 2)$ (Continuity of $1^"st" "to" (2r-2)^"th"$ derivatives at intermediate points). \
+  (3) For _Fixed Derivative Constraints_: #sep \
+  $2(r-1)$ (Fixing $1^"st" "to" (r-1)^"th"$ derivatives at $t_0$ and $t_k$).
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  *> Proof: * \
+  $2k + (k - 1)(2r - 2) + 2(r - 1) = 2r k$, which confirms that total number of constraints is $2r k$.
 
 == Team Work
 
