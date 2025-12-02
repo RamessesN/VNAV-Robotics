@@ -112,12 +112,27 @@
 
 /**************   Abstract   **************/
 #abstract[
+  This report investigates the mathematical foundations and practical application of polynomial trajectory optimization for UAVs. 
+  The primary objective is to formulate trajectory generation as a Quadratic Programming (QP) problem to minimize derivatives of position, such as velocity and snap. 
+  We begin by analytically deriving the cost and constraint matrixes for single-segment minimum velocity problems, verifying that the optimal solutions align with the Euler-Lagrange equation. 
+  The analysis is then extended to multi-segment minimum snap trajectories, identifying the necessary waypoint, continuity, and boundary constraints required for a unique solution. 
+  Finally, these theoretical frameworks are applied to a drone racing scenario, where optimal trajectories are generated to navigate a quadrotor through a sequence of gates.
+
   See Resources on #link("https://github.com/RamessesN/Robotics_MIT")[github.com/RamessesN/Robotics_MIT].
 ]
 
 /**************   Introduction   **************/
 = Introduction
-// TODO
+Trajectory generation is a core component of quadrotor control, ensuring smooth navigation by minimizing specific state derivatives. 
+This laboratory focuses on *Polynomial Trajectory Optimization*, specifically transforming the variational problem of minimizing an integral cost into a numerical Quadratic Program (QP).
+
+The report is structured in three parts:
++ *Single-Segment Formulation* \
+  We analytically derive the cost matrix $Q$ and constraint matrix $A$ for a minimum velocity problem ($r=1$). We verify that the QP solution aligns with the theoretical optimum derived from the Euler-Lagrange equation.
++ *Multi-Segment Extension* \ 
+  We extend the analysis to piece-wise polynomials over $k$ segments. We derive the counting rules for waypoint, continuity, and boundary constraints to ensure a unique solution for high-order problems like Minimum Snap.
++ *Application* \
+  Finally, we utilize this framework to generate optimal trajectories for a drone racing scenario, navigating a quadrotor through a sequence of gates.
 
 /**************   Procedure   **************/
 = Procedure
@@ -241,7 +256,7 @@ Using the QP method above, find the optimal solution and optimal cost of problem
       $p_1 = 4 + p_3$,
       $p_2 = -3 - 2p_3$
     ) #sep \
-    From @3, we have: $Q = mat(1, 1, 1; 1, 4/3, 3/2; 1, 3/2, 9/5)$ #sep \
+    From @3, we have: $Q = mat(1, 1, 1; 1, 4/3, 3/2; 1, 3/2, 9/5)$ #sep \ \
     $p = vec(4 + p_3, -3 - 2p_3, p_3) = underbrace(vec(4, -3, 0), p_"base") + p_3 underbrace(vec(1, -2, 1), d)$ #sep \
     $"For" "Cost"(p_3) = A p_3^2 + B p_3 + C, "we have" cases(A = d^T Q d, B = 2p_"base"^T Q d)$ #sep \
     $therefore Q d = mat(1, 1, 1; 1, 4/3, 3/2; 1, 3/2, 9/5) dot vec(1, -2, 1) = vec(0, -1/6, -1/5)$ #sep \
