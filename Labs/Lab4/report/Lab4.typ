@@ -346,6 +346,74 @@ Using the QP method above, find the optimal solution and optimal cost of problem
     - Packages these values into a `MultiDOFJointTrajectoryPoint` message.
     - Converts the `Eigen` types back to `geometry_msgs` and publishes them to the `/desired_state` topic.
 
+=== Enviroment Preparation
+
+  The experimental environment was set up by updating the codebase and configuring the workspace as follows:
+
+  + *Codebase Synchronization* \
+    First, the lab repository was updated to acquire the latest packages:
+    #codly(languages: codly-languages)
+    ```bash
+    cd ~/labs
+    git pull
+    ```
+    Upon verification, the `~/labs/lab4` directory contained the required packages: 
+    `planner_pkg`, `trajectory_generation_pkg`, and `dependencies`.
+
+  + *Workspace Configuration* \
+    The new packages were copied into the ROS workspace source directory: 
+    #codly(languages: codly-languages)
+    ```bash
+    cp -r ~/labs/lab4/. ~/vnav_ws/src
+    cd ~/vnav_ws
+    ```
+    The `src` directory now includes `controller_pkg`, `tesse-ros-bridge`, `planner_pkg`, `trajectory_generation_pkg`, and `dependencies`. 
+    The workspace was then rebuilt and sourced: 
+    #codly(languages: codly-languages)
+    ```bash
+    catkin build
+    source devel/setup.bash
+    ```
+    Then, copy the #link("https://vnav.mit.edu/material/lab4.zip")[simulator] to `~/vnav-builds/lab4/`.
+    #codly(languages: codly-languages)
+    ```bash
+    cd ~/vnav-builds/lab4/
+    chmod +x lab4.x86_64
+    ```
+
+  + *Simulator Setup* \
+    The #link("https://vnav.mit.edu/material/lab4.zip")[Unity simulator binary] was downloaded to `~/vnav-builds/lab4/` and configured with execution permissions: 
+    #codly(languages: codly-languages)
+    ```bash
+    cd ~/vnav-builds/lab4/
+    chmod +x lab4.x86_64
+    ```
+
+  + *Execution Sequence* \
+    The complete command sequence to launch the simulation environment and the autonomous racing stack is listed below: 
+    #codly(languages: codly-languages)
+    ```bash
+    # 1. Launch Unity Simulator
+    cd ~/vnav-builds/lab4/
+    ./lab4.x86_64
+
+    # 2. Establish ROS Bridge
+    roslaunch tesse_ros_bridge tesse_quadrotor_bridge.launch
+
+    # 3. Start Trajectory Follower (Controller + Traj Generation)
+    roslaunch trajectory_generation traj_following.launch
+
+    # 4. Trigger Race (Waypoint Publisher)
+    roslaunch planner_pkg traj_gen.launch
+    ```
+
+  #figure(
+    image("./source/img/ros_bridge.jpg", width: 100%),
+    caption: [The Tesse ROS Bridge establishing communication between the Unity physics engine and the ROS control stack.]
+  )
+
+  The visualization above shows the Unity simulator running alongside the ROS bridge, which facilitates real-time data exchange between the drone model in Unity and the ROS nodes handling trajectory generation and control.
+
 === Simulation Results
 
   The complete system was tested in the Unity simulator. The drone successfully generated a smooth trajectory passing through all gates and completed the race without collision.
