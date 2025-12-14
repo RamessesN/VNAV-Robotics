@@ -1,4 +1,11 @@
 /**************   Report Template   **************/
+#import "@preview/codly:1.3.0": *
+#import "@preview/codly-languages:0.1.1": *
+
+#show: codly-init.with()
+
+#let table-continued = state("table-continued", false)
+
 #let report-template(
   title: "",
   course: "",
@@ -112,7 +119,7 @@
 
 /**************   Abstract   **************/
 #abstract[
-  This report investigates the mathematical foundations and practical application of polynomial trajectory optimization for UAVs. 
+  Lab4 investigates the mathematical foundations and practical application of polynomial trajectory optimization for UAVs. 
   The primary objective is to formulate trajectory generation as a Quadratic Programming (QP) problem to minimize derivatives of position, such as velocity and snap. 
   We begin by analytically deriving the cost and constraint matrixes for single-segment minimum velocity problems, verifying that the optimal solutions align with the Euler-Lagrange equation. 
   The analysis is then extended to multi-segment minimum snap trajectories, identifying the necessary waypoint, continuity, and boundary constraints required for a unique solution. 
@@ -320,11 +327,51 @@ Using the QP method above, find the optimal solution and optimal cost of problem
 
 === Drone Racing
 
+  In this section, we implemented the `trajectory_generation_node` in C++ to enable the quadrotor to autonomously navigate through a sequence of gates. The implementation details are divided into three functional blocks: initialization, trajectory generation, and command publishing.
+
+  + *State Initialization and Safety Hover* \
+    The node subscribes to the `/current_state` topic to retrieve the UAV's real-time position and orientation. We converted the ROS `Odometry` messages into `Eigen::Vector3d` for internal calculations. 
+    
+    Crucially, to prevent the drone from drifting or crashing before the race starts, we implemented a *safety hover logic*. When the trajectory container is empty (idle state), the node continuously captures the current position and publishes it as the desired setpoint with zero velocity and acceleration. This ensures the drone maintains a stable hover at the starting gate until the race track waypoints are received.
+
+  + *Trajectory Optimization and Constraints* \
+    Upon receiving the gate waypoints, we utilized the `mav_trajectory_generation` library to formulate the optimization problem.
+    - *Position Constraints:* We differentiated between intermediate gates and the endpoints. Intermediate waypoints were added as position constraints allowing non-zero velocity (fly-through), while the final waypoint was constrained using `makeStartOrEnd(...)` to enforce zero velocity and acceleration, ensuring a safe stop.
+    - *Yaw Unwrapping Strategy:* A critical challenge was handling the discontinuity of orientation angles (e.g., the jump from $pi$ to $-pi$). We implemented a yaw unwrapping algorithm that checks the difference between consecutive waypoints. If $|psi_k - psi_(k-1)| > pi$, we added or subtracted $2pi$ to the target yaw. This ensures the generated yaw trajectory is continuous and prevents the drone from spinning unnecessary full circles.
+
+  + *Trajectory Sampling and Publishing* \
+    The generated polynomial trajectory is continuous, but the controller requires discrete setpoints. We set up a ROS timer running at *100Hz*. At each time step $t$, the node:
+    - Checks if $t$ exceeds the total trajectory duration.
+    - Evaluates the polynomial to extract the desired position $x_d(t)$, velocity $v_d(t)$, acceleration $a_d(t)$, and yaw $psi_d(t)$.
+    - Packages these values into a `MultiDOFJointTrajectoryPoint` message.
+    - Converts the `Eigen` types back to `geometry_msgs` and publishes them to the `/desired_state` topic.
+
+=== Simulation Results
+
+  The complete system was tested in the Unity simulator. The drone successfully generated a smooth trajectory passing through all gates and completed the race without collision.
+
+  #figure(
+    image("./source/img/testresult.png", width: 80%),
+    caption: [The quadrotor autonomously navigating through the gates in the Unity simulator environment.]
+  )
+
+  The visualization above confirms that the generated trajectory (visualized by the red path in Rviz/Unity) effectively connects the gate vertices while maintaining smoothness, and the drone's actual path closely tracks this reference.
+
 /**************   Reflection and Analysis   **************/
 = Reflection and Analysis
 
+The implementation process highlighted the importance of robust software design in robotics integration. 
+
+1. *Handling Discontinuities:* The mathematical optimization assumes continuous functions. Practical implementation issues, such as the modular nature of angles (Yaw), required specific algorithmic handling (unwrapping) to bridge the gap between linear algebra and physical rotation.
+
+2. *System Timing:* The synchronization between the trajectory generator and the controller was critical. We observed that the sampling frequency of the trajectory node (100Hz) significantly impacted the flight smoothness. A lower frequency caused "stuttering" in the control commands, while a higher frequency ensured the geometric controller received smooth derivatives (velocity and acceleration feed-forward terms), which are essential for aggressive maneuvers.
+
 /**************   Conclusion   **************/
 = Conclusion
+
+In this lab, we successfully linked the theoretical framework of polynomial trajectory optimization with a practical ROS-based control system. 
+
+We derived the constraints for single-segment and multi-segment optimization, verifying that Minimum Snap trajectories require $8k$ constraints for a unique solution. In the team work section, we implemented the C++ logic to convert these mathematical constraints into a functional software module. The successful drone racing simulation demonstrated that the QP-based approach effectively generates feasible, smooth, and high-speed trajectories for complex 3D environments.
 
 #pagebreak()
 
@@ -332,5 +379,432 @@ Using the QP method above, find the optimal solution and optimal cost of problem
 #set page(header: none, footer: none) 
 
 = Source Code <section:source_code>
-- 
--
+- _*trajectory_generation_node.cpp*_
+#codly(languages: codly-languages)
+```cpp
+#include <eigen_conversions/eigen_msg.h>
+#include <geometry_msgs/PoseArray.h>
+#include <nav_msgs/Odometry.h>
+#include <ros/ros.h>
+#include <trajectory_msgs/MultiDOFJointTrajectory.h>
+
+#include <mav_trajectory_generation/polynomial_optimization_linear.h>
+#include <mav_trajectory_generation/trajectory.h>
+
+#include <tf/transform_datatypes.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <eigen3/Eigen/Dense>
+
+class WaypointFollower {
+  [[maybe_unused]] ros::Subscriber currentStateSub;
+  [[maybe_unused]] ros::Subscriber poseArraySub;
+  ros::Publisher desiredStatePub;
+
+  // Current state
+  Eigen::Vector3d x;  // current position of the UAV's c.o.m. in the world frame
+
+  ros::Timer desiredStateTimer;
+
+  ros::Time trajectoryStartTime;
+  mav_trajectory_generation::Trajectory trajectory;
+  mav_trajectory_generation::Trajectory yaw_trajectory;
+
+  void onCurrentState(nav_msgs::Odometry const& cur_state) {    
+    // PART 1.1 - 将 ROS 消息转换为 Eigen 向量
+    tf::pointMsgToEigen(cur_state.pose.pose.position, x);
+  }
+
+  void generateOptimizedTrajectory(geometry_msgs::PoseArray const& poseArray) {
+    if (poseArray.poses.size() < 1) {
+      ROS_ERROR("Must have at least one pose to generate trajectory!");
+      trajectory.clear();
+      yaw_trajectory.clear();
+      return;
+    }
+
+    if (!trajectory.empty()) return;
+
+    const int D = 3;  // dimension of each vertex in the trajectory
+    mav_trajectory_generation::Vertex start_position(D), end_position(D);
+    mav_trajectory_generation::Vertex::Vector vertices;
+    mav_trajectory_generation::Vertex start_yaw(1), end_yaw(1);
+    mav_trajectory_generation::Vertex::Vector yaw_vertices;
+
+    // Convert the pose array to a list of vertices
+    // Start from the current position and zero orientation
+    using namespace mav_trajectory_generation::derivative_order;
+    start_position.makeStartOrEnd(x, SNAP);
+    vertices.push_back(start_position);
+    
+    start_yaw.addConstraint(ORIENTATION, 0);
+    yaw_vertices.push_back(start_yaw);
+
+    double last_yaw = 0;
+    
+    for (auto i = 0; i < poseArray.poses.size(); ++i) {
+      // PART - 1.2
+
+      // --- 1. Process position vertex ---
+      Eigen::Vector3d pos_eigen;
+      tf::pointMsgToEigen(poseArray.poses[i].position, pos_eigen);
+
+      mav_trajectory_generation::Vertex pos_vertex(D);
+      
+      // If it is the last point, it must be the end point, and the velocity acceleration is forced to be 0
+      if (i == poseArray.poses.size() - 1) {
+          pos_vertex.makeStartOrEnd(pos_eigen, SNAP);
+      } else {
+          // If it is an intermediate point, only position constraints are added to allow passage at a certain speed
+          pos_vertex.addConstraint(POSITION, pos_eigen);
+      }
+      vertices.push_back(pos_vertex);
+
+
+      // --- 2. Process yaw vertex ---
+      double current_yaw = tf::getYaw(poseArray.poses[i].orientation);
+
+      while (current_yaw - last_yaw > M_PI) current_yaw -= 2 * M_PI;
+      while (current_yaw - last_yaw < -M_PI) current_yaw += 2 * M_PI;
+
+      mav_trajectory_generation::Vertex yaw_vertex(1);
+      yaw_vertex.addConstraint(ORIENTATION, current_yaw);
+      yaw_vertices.push_back(yaw_vertex);
+
+      last_yaw = current_yaw;
+    }
+    
+    std::vector<double> segment_times;
+    const double v_max = 15.0;
+    const double a_max = 10.0;
+    segment_times = estimateSegmentTimes(vertices, v_max, a_max);
+    for(int i = 0; i < segment_times.size(); i++) {
+      segment_times[i] *= 0.6;
+    }
+
+    // Position
+    const int N = 10;
+    mav_trajectory_generation::PolynomialOptimization<N> opt(D);
+    opt.setupFromVertices(vertices, segment_times, mav_trajectory_generation::derivative_order::SNAP);
+    opt.solveLinear();
+
+    // Yaw
+    mav_trajectory_generation::PolynomialOptimization<N> yaw_opt(1);
+    yaw_opt.setupFromVertices(yaw_vertices, segment_times, mav_trajectory_generation::derivative_order::SNAP);
+    yaw_opt.solveLinear();
+
+    mav_trajectory_generation::Segment::Vector segments;
+    opt.getTrajectory(&trajectory);
+    yaw_opt.getTrajectory(&yaw_trajectory);
+    trajectoryStartTime = ros::Time::now();
+
+    ROS_INFO("Generated optimizes trajectory from %lu waypoints", vertices.size());
+  }
+
+  void publishDesiredState(ros::TimerEvent const& ev) {
+    if (trajectory.empty()) {
+        // If there is no trajectory yet, publish the current position as the desired position
+        trajectory_msgs::MultiDOFJointTrajectoryPoint hover_point;
+        
+        hover_point.time_from_start = ros::Duration(0.0);
+
+        // 1. Set the position to the current position x
+        geometry_msgs::Transform transform;
+        tf::vectorEigenToMsg(x, transform.translation);
+        
+        transform.rotation = tf::createQuaternionMsgFromYaw(0); 
+        hover_point.transforms.push_back(transform);
+
+        // 2. Set the speed to 0
+        geometry_msgs::Twist velocity;
+        velocity.linear.x = 0; velocity.linear.y = 0; velocity.linear.z = 0;
+        velocity.angular.x = 0; velocity.angular.y = 0; velocity.angular.z = 0;
+        hover_point.velocities.push_back(velocity);
+
+        // 3. Set the acceleration to 0
+        geometry_msgs::Twist accel;
+        accel.linear.x = 0; accel.linear.y = 0; accel.linear.z = 0;
+        accel.angular.x = 0; accel.angular.y = 0; accel.angular.z = 0;
+        hover_point.accelerations.push_back(accel);
+
+        // Issue hover commands
+        desiredStatePub.publish(hover_point);
+        return;
+    }
+
+    //  PART 1.3
+    trajectory_msgs::MultiDOFJointTrajectoryPoint next_point;
+    
+    // 1. Calculate the time from the beginning of the trajectory to the present
+    ros::Duration time_from_start = ros::Time::now() - trajectoryStartTime;
+    next_point.time_from_start = time_from_start; 
+
+    double sampling_time = time_from_start.toSec(); 
+
+    // 2. The time is prevented from exceeding the total length of the trajectory
+    if (sampling_time > trajectory.getMaxTime())
+      sampling_time = trajectory.getMaxTime();
+
+    // Getting the desired state based on the optimized trajectory we found.
+    using namespace mav_trajectory_generation::derivative_order;
+    Eigen::Vector3d des_position = trajectory.evaluate(sampling_time, POSITION);
+    Eigen::Vector3d des_velocity = trajectory.evaluate(sampling_time, VELOCITY);
+    Eigen::Vector3d des_accel = trajectory.evaluate(sampling_time, ACCELERATION);
+    Eigen::VectorXd des_orientation = yaw_trajectory.evaluate(sampling_time, ORIENTATION);
+    
+    // Populate next_point
+
+    // A. Fill Transform (position + pose)
+    geometry_msgs::Transform transform;
+    tf::vectorEigenToMsg(des_position, transform.translation);
+    tf::quaternionTFToMsg(tf::createQuaternionFromYaw(des_orientation(0)), transform.rotation);
+    next_point.transforms.push_back(transform);
+
+    // B. Fill Velocity (linear velocity + angular velocity)
+    geometry_msgs::Twist velocity;
+    tf::vectorEigenToMsg(des_velocity, velocity.linear);
+    velocity.angular.x = 0; 
+    velocity.angular.y = 0; 
+    velocity.angular.z = 0;
+    next_point.velocities.push_back(velocity);
+
+    // C. Fill Acceleration (linear acceleration)
+    geometry_msgs::Twist accel;
+    tf::vectorEigenToMsg(des_accel, accel.linear);
+    accel.angular.x = 0;
+    accel.angular.y = 0;
+    accel.angular.z = 0;
+    next_point.accelerations.push_back(accel);
+    
+    desiredStatePub.publish(next_point);
+  }
+
+public:
+  explicit WaypointFollower(ros::NodeHandle& nh) {
+    currentStateSub = nh.subscribe(
+        "/current_state", 1, &WaypointFollower::onCurrentState, this);
+    poseArraySub = nh.subscribe("/desired_traj_vertices",
+                                1,
+                                &WaypointFollower::generateOptimizedTrajectory,
+                                this);
+    desiredStatePub =
+        nh.advertise<trajectory_msgs::MultiDOFJointTrajectoryPoint>(
+            "/desired_state", 1);
+    desiredStateTimer = nh.createTimer(
+        ros::Rate(100), &WaypointFollower::publishDesiredState, this);
+    desiredStateTimer.start();
+  }
+};
+
+int main(int argc, char** argv) {
+  ros::init(argc, argv, "trajectory_generation_node");
+  ros::NodeHandle nh;
+
+  WaypointFollower waypointFollower(nh);
+
+  ros::spin();
+  return 0;
+}
+```
+
+- _*controller_node.cpp*_
+#codly(languages: codly-languages)
+```cpp
+#include <ros/ros.h>
+
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/utils.h>
+#include <mav_msgs/Actuators.h>
+#include <nav_msgs/Odometry.h>
+#include <trajectory_msgs/MultiDOFJointTrajectoryPoint.h>
+#include <cmath>
+
+#define PI M_PI
+
+#include <eigen3/Eigen/Dense>
+#include <tf2_eigen/tf2_eigen.h>
+
+class controllerNode{
+  ros::NodeHandle nh;
+
+  // PART 1: Declare ROS callback handlers
+  ros::Subscriber des_state_sub, cur_state_sub;
+  ros::Publisher propeller_speeds_pub;
+  ros::Timer control_timer;
+
+  // Controller parameters
+  double kx, kv, kr, komega;
+
+  // Physical constants (we will set them below)
+  double m;              // mass of the UAV
+  double g;              // gravity acceleration
+  double d;              // distance from the center of propellers to the c.o.m.
+  double cf,             // Propeller lift coefficient
+         cd;             // Propeller drag coefficient
+
+  Eigen::Matrix3d J;     // Inertia Matrix
+  Eigen::Vector3d e3;    // [0,0,1]
+  Eigen::MatrixXd F2W;   // Wrench-rotor speeds map
+
+  // Controller internals
+  // Current state
+  Eigen::Vector3d x;     // current position of the UAV's c.o.m. in the world frame
+  Eigen::Vector3d v;     // current velocity of the UAV's c.o.m. in the world frame
+  Eigen::Matrix3d R;     // current orientation of the UAV
+  Eigen::Vector3d omega; // current angular velocity of the UAV's c.o.m. in the *body* frame
+
+  // Desired state
+  Eigen::Vector3d xd;    // desired position of the UAV's c.o.m. in the world frame
+  Eigen::Vector3d vd;    // desired velocity of the UAV's c.o.m. in the world frame
+  Eigen::Vector3d ad;    // desired acceleration of the UAV's c.o.m. in the world frame
+  double yawd;           // desired yaw angle
+
+  double hz;             // frequency of the main control loop
+
+  static Eigen::Vector3d Vee(const Eigen::Matrix3d& in){
+    Eigen::Vector3d out;
+    out << in(2,1), in(0,2), in(1,0);
+    return out;
+  }
+
+  static double signed_sqrt(double val){
+    return val > 0 ? sqrt(val) : -sqrt(-val);
+  }
+
+public:
+  controllerNode():e3(0,0,1),F2W(4,4),hz(1000.0){
+      // PART 2: Initialize ROS callback handlers
+      xd = Eigen::Vector3d::Zero();
+      vd = Eigen::Vector3d::Zero();
+      ad = Eigen::Vector3d::Zero();
+      yawd = 0.0;
+      kx, kv, kr, komega = 0, 0, 0, 0;
+
+      des_state_sub = nh.subscribe("desired_state", 1, &  controllerNode::onDesiredState, this);
+      cur_state_sub = nh.subscribe("current_state", 1, &controllerNode::onCurrentState, this);
+      propeller_speeds_pub = nh.advertise<mav_msgs::Actuators>("/rotor_speed_cmds", 1);
+      control_timer = nh.createTimer(ros::Duration(1.0/hz), &controllerNode::controlLoop, this);
+
+      // PART 6: Tune your gains!
+      nh.getParam("kx", kx);
+      nh.getParam("kv", kv);
+      nh.getParam("kr", kr);
+      nh.getParam("komega", komega);
+      ROS_INFO("Gain values:\nkx: %f \nkv: %f \nkr: %f \nkomega: %f\n", kx, kv, kr, komega);
+
+      // Initialize constants
+      m = 1.0;
+      cd = 1e-5;
+      cf = 1e-3;
+      g = 9.81;
+      d = 0.3;
+      J << 1.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,1.0;
+
+      // F2W matrix
+      double d_by_sqrt2 = d/std::sqrt(2.0);
+      F2W <<
+          cf,            cf,            cf,            cf,
+          cf*d_by_sqrt2, cf*d_by_sqrt2,-cf*d_by_sqrt2,-cf*d_by_sqrt2,
+         -cf*d_by_sqrt2, cf*d_by_sqrt2, cf*d_by_sqrt2,-cf*d_by_sqrt2,
+          cd,           -cd,            cd,           -cd;
+  }
+
+  void onDesiredState(const trajectory_msgs::MultiDOFJointTrajectoryPoint& des_state){
+      //  PART 3: Objective - fill in xd, vd, ad, yawd
+      xd << des_state.transforms[0].translation.x, 
+            des_state.transforms[0].translation.y, 
+            des_state.transforms[0].translation.z;
+            
+      vd << des_state.velocities[0].linear.x, 
+            des_state.velocities[0].linear.y, 
+            des_state.velocities[0].linear.z;
+            
+      ad << des_state.accelerations[0].linear.x, 
+            des_state.accelerations[0].linear.y, 
+            des_state.accelerations[0].linear.z;
+
+      tf2::Quaternion quat;
+      tf2::fromMsg(des_state.transforms[0].rotation, quat);
+      yawd = tf2::getYaw(quat);
+  }
+
+  void onCurrentState(const nav_msgs::Odometry& cur_state){
+      // PART 4: Objective - fill in x, v, R and omega
+      // Position
+      x << cur_state.pose.pose.position.x, 
+          cur_state.pose.pose.position.y, 
+          cur_state.pose.pose.position.z;
+
+      // Velocity
+      v << cur_state.twist.twist.linear.x, 
+          cur_state.twist.twist.linear.y, 
+          cur_state.twist.twist.linear.z;
+
+      // Orientation
+      tf2::Quaternion quat;
+      tf2::fromMsg(cur_state.pose.pose.orientation, quat);
+      Eigen::Quaterniond eigen_quat(quat.w(), quat.x(), quat.y(), quat.z());
+      eigen_quat.normalize();
+      R = eigen_quat.toRotationMatrix();
+
+      // Angular velocity
+      Eigen::Vector3d omega_world;
+      omega_world << cur_state.twist.twist.angular.x, 
+                    cur_state.twist.twist.angular.y, 
+                    cur_state.twist.twist.angular.z;
+
+      omega = R.transpose() * omega_world;
+  }
+
+  void controlLoop(const ros::TimerEvent& t){
+    Eigen::Vector3d ex, ev, er, eomega;
+    // PART 5: Objective - Implement the controller!
+    ex = x - xd; // position error
+    ev = v - vd; // velocity error
+
+    // Rd matrix
+    Eigen::Vector3d F_des = -kx*ex - kv*ev + m*g*e3 + m*ad;
+    Eigen::Vector3d b3d = F_des.normalized();
+    Eigen::Vector3d b1d_desired(cos(yawd), sin(yawd), 0);
+
+    Eigen::Vector3d b2d = (b3d.cross(b1d_desired)).normalized();
+    Eigen::Vector3d b1d = (b2d.cross(b3d)).normalized();
+
+    Eigen::Matrix3d Rd;
+    Rd.col(0) = b1d;
+    Rd.col(1) = b2d;
+    Rd.col(2) = b3d;
+    
+    er = 0.5 * Vee(Rd.transpose() * R - R.transpose() * Rd); // Orientation error
+    eomega = omega; // Rotation-rate error
+    
+    // Desired wrench
+    double f = (-kx * ex + -kv * ev + m * g * e3 + m * ad).dot(R * e3);
+    Eigen::Vector3d M = -kr * er - komega * eomega + omega.cross(J * omega);
+
+    // Recover the rotor speeds from the wrench
+    Eigen::Vector4d W;
+    W << f, M.x(), M.y(), M.z();
+    Eigen::Vector4d omega_sq = F2W.colPivHouseholderQr().solve(W);
+
+    Eigen::Vector4d rotor_speeds;
+    for (int i = 0; i < 4; i++) {
+        rotor_speeds(i) = signed_sqrt(omega_sq[i]);
+    }
+
+    // Populate and publish the control message
+    mav_msgs::Actuators control_msg;
+    control_msg.angular_velocities.clear();
+    for (int i = 0; i < 4; i++) {
+        control_msg.angular_velocities.push_back(rotor_speeds(i));
+    }
+    propeller_speeds_pub.publish(control_msg);
+  }
+};
+
+int main(int argc, char** argv){
+  ros::init(argc, argv, "controller_node");
+  controllerNode n;
+  ros::spin();
+}
+```
