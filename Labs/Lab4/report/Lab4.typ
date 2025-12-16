@@ -425,21 +425,35 @@ Using the QP method above, find the optimal solution and optimal cost of problem
 
   The visualization above confirms that the generated trajectory (visualized by the red path in Rviz/Unity) effectively connects the gate vertices while maintaining smoothness, and the drone's actual path closely tracks this reference.
 
-/**************   Reflection and Analysis   **************/
+/************** Reflection and Analysis   **************/
 = Reflection and Analysis
 
-The implementation process highlighted the importance of robust software design in robotics integration. 
+This lab effectively bridged the gap between optimal control theory and real-world robotics application. Our analysis is divided into two perspectives: theoretical insights from the individual derivation and practical challenges encountered during the team implementation.
 
-1. *Handling Discontinuities:* The mathematical optimization assumes continuous functions. Practical implementation issues, such as the modular nature of angles (Yaw), required specific algorithmic handling (unwrapping) to bridge the gap between linear algebra and physical rotation.
+== Theoretical Insights
+The derivation of the Quadratic Programming (QP) formulation for trajectory generation revealed several key insights:
++ *Optimality of Polynomials:* The analytical solution to the minimum velocity problem ($r=1$) confirmed that the optimal path connecting two points with minimal energy is a straight line. This aligns perfectly with the Euler-Lagrange equation ($P^((2r))(t) = 0$), where for $r=1$, $P''(t)=0$, implying a linear function. Even when higher-degree polynomials (degree 2 or 3) were allowed, the optimization naturally drove the coefficients of higher-order terms to zero to minimize the cost, demonstrating the robustness of the variational approach.
++ *Constraint Complexity:* Extending the problem to multi-segment minimum snap trajectories highlighted the combinatorial nature of constraints. We derived that for a system minimizing the $r$-th derivative over $k$ segments, exactly $2r k$ constraints are required. This theoretical bound is critical for system design; missing a single continuity constraint at an intermediate waypoint can lead to a singular matrix, making the trajectory unsolvable.
 
-2. *System Timing:* The synchronization between the trajectory generator and the controller was critical. We observed that the sampling frequency of the trajectory node (100Hz) significantly impacted the flight smoothness. A lower frequency caused "stuttering" in the control commands, while a higher frequency ensured the geometric controller received smooth derivatives (velocity and acceleration feed-forward terms), which are essential for aggressive maneuvers.
+== Practical Implementation Challenges
+Translating the math into C++ code for drone racing introduced engineering complexities not captured by the QP formulation alone:
++ *Yaw Discontinuities:* While position trajectories are defined in Euclidean space $RR^3$, orientation exists in the special orthogonal group $"SO"(3)$ (represented here by Yaw angle). A naive implementation of yaw constraints led to "unnecessary spins" when the target angle crossed the $\pm \pi$ boundary. Implementing a *yaw unwrapping algorithm* was essential to linearize the angular space for the polynomial solver.
++ *Time-Scaling vs. Control Limits:* To achieve faster lap times (Extra Credit), we utilized time scaling. We observed a strict trade-off: compressing the trajectory time increases the required centripetal acceleration ($a = v^2/r$). If this exceeds the drone's physical thrust-to-weight ratio, the geometric controller saturates and fails to track. This required iterative tuning of both the time scaling factor and the controller gains ($k_x, k_v, k_R$) to find the boundary of stability.
++ *System Synchronization:* The frequency of the trajectory sampler proved vital. A low sampling rate (e.g., 5Hz) caused aliasing and jerky control inputs, while 100Hz provided smooth feed-forward derivatives, essential for high-speed tracking.
 
-/**************   Conclusion   **************/
+/************** Conclusion   **************/
 = Conclusion
 
-In this lab, we successfully linked the theoretical framework of polynomial trajectory optimization with a practical ROS-based control system. 
+In this laboratory, we successfully developed a complete pipeline for autonomous quadrotor navigation, moving from mathematical derivation to simulation-based racing.
 
-We derived the constraints for single-segment and multi-segment optimization, verifying that Minimum Snap trajectories require $8k$ constraints for a unique solution. In the team work section, we implemented the C++ logic to convert these mathematical constraints into a functional software module. The successful drone racing simulation demonstrated that the QP-based approach effectively generates feasible, smooth, and high-speed trajectories for complex 3D environments.
+In the *Individual Work*, we established the theoretical foundation by formulating the trajectory generation as a Quadratic Program. We analytically verified that the QP solution matches the calculus of variations result and generalized the constraint counting rules for high-order minimum snap trajectories ($2r k$ constraints).
+
+In the *Team Work*, we implemented this framework in ROS. By leveraging the `mav_trajectory_generation` library, we solved the multi-segment optimization problem to navigate a drone through a complex race course. Key technical achievements included:
+- Developing a robust state machine with safety hover logic.
+- Solving the yaw wrap-around problem for continuous orientation control.
+- Fine-tuning the geometric controller and time-scaling parameters to achieve high-speed, collision-free flight.
+
+The final simulation results validated our approach, demonstrating that polynomial optimization is a powerful tool for generating feasible, smooth, and aggressive trajectories for agile aerial robots.
 
 #pagebreak()
 
