@@ -279,7 +279,7 @@
 ]
 
 #boldify[
-  2. OPTIONAL (5 bonus pts): Describe the pseudo-code of a RANSAC algorithm using the minimal solver developed in point a) to compute the relative pose in presence of outliers (wrong correspondences).
+  2. Describe the pseudo-code of a RANSAC algorithm using the minimal solver developed in point a) to compute the relative pose in presence of outliers (wrong correspondences).
 ]
 
 #indent[
@@ -351,6 +351,150 @@
 /**************   Team Work   **************/
 == Team Work
 
+=== Initial Setup
+
+#indent[
+  This section is to calibrate the camera of the drone, namely to obtain the camera intrinsics and distortion coefficients.
+
+  Therefore, we need to check the implementation of `calibrateKeypoints` at first --- Using the camera's intrinsic parameters and distortion coefficients, convert the pixel coordinates into undistorted 3D direction vectors.
+  The correpsonding code is as follows:
+  ```cpp
+  void calibrateKeypoints(const std::vector<cv::Point2f>& pts1,
+                        const std::vector<cv::Point2f>& pts2,
+                        opengv::bearingVectors_t& bearing_vector_1,
+                        opengv::bearingVectors_t& bearing_vector_2) {
+      //
+      // For this part, we perform:
+      //   1. Use the function cv::undistortPoints to rectify the keypoints.
+      //   2. Return the bearing vectors for each keypoint.
+      //
+
+      std::vector<cv::Point2f> points1_rect, points2_rect;
+      cv::undistortPoints(pts1, points1_rect, camera_params_.K, camera_params_.D);
+      cv::undistortPoints(pts2, points2_rect, camera_params_.K, camera_params_.D);
+
+      for (auto const& pt: points1_rect){
+        opengv::bearingVector_t bearing_vector(pt.x, pt.y, 1); // focal length is 1 after undistortion
+        bearing_vector_1.push_back(bearing_vector.normalized());
+      }
+
+      for (auto const& pt: points2_rect){
+        opengv::bearingVector_t bearing_vector(pt.x, pt.y, 1); // focal length is 1 after undistortion
+        bearing_vector_2.push_back(bearing_vector.normalized());
+      }
+  }
+  ```
+
+  Then, call this function in `cameraCallback` with just one line code:
+
+  `calibrateKeypoints(pts1, pts2, bearing_vector_1, bearing_vector_2);`
+
+  After calling `calibrateKeypoints`, `bearing_vector_1` and `bearing_vector_2` will contain the undistorted direction vectors.
+  Subsequently, the line of code 
+  
+  `Adapter adapter_mono(bearing_vector_1, bearing_vector_2);` 
+  
+  in the code can correctly feed these data to the *RANSAC* algorithm. 
+]
+
+=== 2D-2D Correspondences
+#indent[
+  In this section, we implemented and evaluated three different algorithms for estimating the relative camera motion between consecutive frames using 2D-2D feature correspondences. 
+  
+  #strong[Experimental Methodology]
+
+  + *Feature Tracking:* Utilizing the SIFT-based tracker developed in the previous lab to obtain matched keypoints between the previous and current frames.
+  + *Keypoint Calibration:* Since the geometric algorithms assume a calibrated pinhole camera model, we implemented `calibrateKeypoints` to undistort the raw pixel coordinates using the provided camera intrinsics ($K$) and distortion coefficients ($D$), converting them into normalized bearing vectors.
+  + *Motion Estimation:* We utilized the OpenGV library to solve for the relative pose ($R, t$) using:
+    - *Nistér's 5-point Algorithm:* A minimal solver for the essential matrix.
+    - *Longuet-Higgins 8-point Algorithm:* A linear solver for the essential matrix.
+    - *2-point Algorithm (Known Rotation):* A minimal solver for translation, assuming the relative rotation is known (provided by ground truth in this experiment to simulate a high-precision IMU).
+  + *Scale Correction:* As monocular vision inherently suffers from scale ambiguity, we normalized the estimated translation vector and rescaled it using the magnitude of the ground truth translation (`scaleTranslation`) to allow for meaningful visualization and comparison in Rviz.
+
+  #strong[Implementation Details]
+
+  The core logic was implemented in the `cameraCallback` function. Before passing data to the solvers, we verified that the feature tracker returned a sufficient number of correspondences. We used `cv::undistortPoints` to map pixel coordinates to the normalized image plane.
+
+  For the pose estimation, we employed `opengv::sac::Ransac` to robustly estimate the model in the presence of outliers.
+  - For the *5-point* and *8-point* methods, we used `CentralRelativePoseSacProblem`.
+  - For the *2-point* method, we calculated the relative rotation from the ground truth odometry ($R_{"GT"} = R_{"prev"}^T R_{"curr"}$) and used `TranslationOnlySacProblem` to solve solely for the translation direction.
+
+  (_Note:_ We need to add two more parameters to the launch file --- `use_ransac` & `pose_estmato r`.)
+
+  With the command `roslaunch lab_6 video_tracking.launch pose_estimator:=0 use_ransac:=<True/False>`, we have:
+
+  #figure(
+    image("img/2d_ransac.png", width: 80%),
+    caption: [Running Snapshot]
+  )
+
+  #strong[Performance Evaluation & Analysis]
+
+  + Impact of RANSAC on Estimation Accuracy
+    To validate the necessity of outlier rejection in Visual Odometry (VO), we compared the performance of the 5-point algorithm with and without RANSAC. The detailed implementation is #link(<section:rpe_comparison_py>)[here] and the results are visualized in the figure below:
+
+    #figure(
+      image("img/rpe_comparison.jpg", width: 70%),
+      caption: [Visualization of the 5-points-based RPE Translation and Rotation Errors Comparison (With vs. Without RANSAC)]
+    )
+
+    - *Without RANSAC (Red Line):* The error metrics exhibit significant instability, with frequent spikes in both rotation (exceeding 10 degrees) and translation errors. This confirms that even a small ratio of outliers (mismatched features) can severely corrupt the algebraic solution of the minimal solver.
+    - *With RANSAC (Blue Line):* The errors are drastically reduced and remain stable over the trajectory. The rotation error is consistently low (< 2 degrees), and the translation error (direction) is bounded, proving that the RANSAC framework effectively filters out spurious matches and selects the best geometric model.
+
+  + Comparison of Different Algorithms
+    We further compared the performance of the three geometric algorithms (all using RANSAC). The corresponding python script is #link(<section:algorithm_comparison_py>)[here] and the Relative Pose Errors (RPE) for translation and rotation are plotted below:
+
+    #figure(
+      image("img/algorithm_comparison.jpg", width: 70%),
+      caption: [Visualization of the 5-points, 8-points, 2-points Algorithms Translation and Rotation Errors Comparison]
+    )
+
+    + *Rotation Error:*
+      - The *2-point algorithm (Orange)* shows zero rotation error. This is expected and validates our implementation, as we fed the ground truth rotation into the solver.
+      - The *5-point (Blue)* and *8-point (Green)* algorithms show comparable performance in rotation estimation, generally keeping the error under 3 degrees. The 5-point algorithm appears slightly more stable in certain segments, likely because it enforces the internal constraints of the essential matrix more strictly than the linear 8-point method.
+    + *Translation Error:*
+      - All three methods exhibit fluctuations in translation error. This is typical for monocular VO, especially when the camera motion is small (low parallax) or the scene structure is degenerate (e.g., planar scenes).
+      - The *2-point algorithm*, despite having perfect rotation, still shows translation errors. This indicates that translation estimation is highly sensitive to feature noise, even when rotation is known. However, it generally maintains a lower error baseline compared to the 5-point and 8-point methods, demonstrating the benefit of reducing the degrees of freedom when reliable rotation data (e.g., from IMU) is available.
+]
+
+=== 3D-3D Correspondences
+#indent[
+  This section is to estimate the relative camera motion by aligning two sets of 3D points (3D-3D registration), which allows for the recovery of the trajectory with *absolute scale*, eliminating the need for the ground-truth scaling trick used in Deliverable 4.
+
+  #strong[Experimental Methodology]
+
+  We move beyond monocular vision constraints by incorporating depth information provided by the RGB-D sensor.
+
+  The workflow proceeds as follows:
+  + *3D Point Generation:* For each matched keypoint $(u, v)$ in the RGB image, we queried the corresponding value $d$ from the registered depth image. The 2D keypoints were first converted to normalized bearing vectors (using camera intrinsics) and then scaled by their respective depth values to obtain 3D coordinates in the camera frame: $P_{"cam"} = d dot K^{-1} dot [u, v, 1]^T$.
+  + *Point Cloud Registration:* We utilized *Arun's Method* (a closed-form solution based on Singular Value Decomposition) to find the rigid body transformation ($R, t$) that aligns the 3D points from the previous frame ($P_{"prev"}$) to the current frame ($P_{"curr"}$).
+  + *Robust Estimation:* To handle noisy depth measurements and mismatches, the algorithm was wrapped in a RANSAC loop provided by OpenGV.
+
+  #strong[Implementation Details]
+
+  The implementation was carried out in `cameraCallback` (Case 3).
+  - *Data Preparation:* We iterated through the matched keypoints, retrieved depth values using `depth.at<float>(y, x)`, and constructed two point clouds (`opengv::points_t`).
+  - *OpenGV Integration:* We used the `PointCloudAdapter` and `PointCloudSacProblem` classes from OpenGV to interface with the RANSAC solver. The threshold for RANSAC was set in meters (e.g., 0.1m) to reject points with large re-projection errors.
+  - *Scale Handling:* Unlike the previous 2D-2D experiments, we explicitly disabled the `scaleTranslation` parameter in the launch file. This ensures that the translation output is derived purely from the visual data, verifying the system's ability to recover the true physical scale of the motion.
+
+  (_Note:_ We need to add one more parameter to the launch file --- `scale_translation`.)
+
+  With the command `roslaunch lab_6 video_tracking.launch pose_estimator:=3 scale_translation:=0`, we have the running result.
+
+  #strong[Performance Evaluation & Analysis]
+
+  We evaluated the accuracy of the 3D-3D estimation by comparing it against the ground truth. The code is #link(<section:arun_3d_py>)[here] and the translation and rotation errors are visualized below:
+
+  #figure(
+    image("img/arun_3d.jpg", width: 70%),
+    caption: [Visualization of the Translation and Rotation Errors of Arun's Algorithm with RANSAC]
+  )
+
+  - *Absolute Scale Recovery:* The most significant observation is the translation error plot (top). Unlike Deliverable 4, where the error was unitless (direction only), here the error is measured in *meters*. The error remains low --- typically bounded within $0.05 ~ 0.2$ meters --- confirming that Arun's method successfully recovered the absolute scale of the drone's movement using the depth map.
+  - *Rotation Accuracy:* The rotation error (bottom) is extremely low, consistently staying below $1.0$ degree. This indicates that 3D-3D registration provides a very strong constraint on orientation, often outperforming 2D-2D methods which can suffer from rotation-translation ambiguity in certain motion configurations.
+  - *Stability:* The trajectory estimation is robust and does not exhibit the scale drift issues common in monocular VO systems, demonstrating the advantage of RGB-D sensors for indoor navigation.
+]
+
 /**************   Reflection and Analysis   **************/
 = Reflection and Analysis
 
@@ -363,5 +507,703 @@
 #set page(header: none, footer: none) 
 
 = Source Code <section:source_code>
-- 
--
+- _*pose_estimation.cpp*_
+```cpp
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
+#include <memory>
+
+#include <gflags/gflags.h>
+#include <glog/logging.h>
+
+#include <ros/ros.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/synchronizer.h>
+#include <message_filters/sync_policies/approximate_time.h>
+#include <image_transport/image_transport.h>
+#include <image_transport/subscriber_filter.h>
+#include <sensor_msgs/image_encodings.h>
+#include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <tf/tf.h>
+#include <tf/transform_datatypes.h>
+#include <tf_conversions/tf_eigen.h>
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
+
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/highgui/highgui.hpp>
+
+#include <Eigen/Eigen>
+
+#include <opencv2/core.hpp>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/core/eigen.hpp>
+
+// OpenGV
+#include <opengv/sac/Ransac.hpp>
+#include <opengv/sac_problems/relative_pose/TranslationOnlySacProblem.hpp>
+#include <opengv/sac_problems/relative_pose/CentralRelativePoseSacProblem.hpp>
+#include <opengv/sac_problems/point_cloud/PointCloudSacProblem.hpp>
+#include <opengv/relative_pose/CentralRelativeAdapter.hpp>
+#include <opengv/relative_pose/methods.hpp>
+#include <opengv/point_cloud/PointCloudAdapter.hpp>
+#include <opengv/point_cloud/methods.hpp>
+
+#include "lab6_utils.h"
+#include "pose_estimation.h"
+#include "tracker_shim.h"
+
+DEFINE_bool(use_ransac, true, "Use Random Sample Consensus.");
+DEFINE_bool(scale_translation, true, "Whether to scale estimated translation to match ground truth scale");
+DEFINE_int32(pose_estimator, 0,
+             "Pose estimation algorithm, valid values are:"
+             "0 for OpengGV's 5-point algorithm."
+             "1 for OpengGV's 8-point algorithm."
+             "2 for OpengGV's 2-point algorithm."
+             "3 for Arun's 3-point method.");
+
+using namespace std;
+namespace enc = sensor_msgs::image_encodings;
+
+using RansacProblem = opengv::sac_problems::relative_pose::CentralRelativePoseSacProblem;
+using Adapter = opengv::relative_pose::CentralRelativeAdapter;
+using RansacProblemGivenRot = opengv::sac_problems::relative_pose::TranslationOnlySacProblem;
+using AdapterGivenRot = opengv::relative_pose::CentralRelativeAdapter;
+using Adapter3D = opengv::point_cloud::PointCloudAdapter;
+using RansacProblem3D = opengv::sac_problems::point_cloud::PointCloudSacProblem;
+
+std::unique_ptr<TrackerWrapper> feature_tracker_;
+ros::Publisher pub_pose_estimation_, pub_pose_gt_;
+ros::Subscriber sub_cinfo_;
+geometry_msgs::PoseStamped curr_pose_;
+geometry_msgs::PoseStamped prev_pose_;
+
+CameraParams camera_params_;
+cv::Mat R_camera_body, t_camera_body;
+cv::Mat T_camera_body;
+geometry_msgs::Pose pose_camera_body;
+tf::Transform transform_camera_body;
+
+
+void poseCallbackTesse(const nav_msgs::Odometry::ConstPtr& msg){
+  curr_pose_.pose = msg->pose.pose;
+
+  tf::Transform current_pose;
+  tf::poseMsgToTF(curr_pose_.pose, current_pose);
+
+  tf::poseTFToMsg(current_pose * transform_camera_body, curr_pose_.pose);
+  
+  curr_pose_.header.frame_id = "world";
+  pub_pose_gt_.publish(curr_pose_);
+}
+
+/**
+ * @brief      Compute 3D bearing vectors from pixel points
+ *
+ * @param[in]  pts1              Feature correspondences from camera 1
+ * @param[in]  pts2              Feature correspondences from camera 2
+ * @param      bearing_vector_1  Bearing vector to pts1 in camera 1
+ * @param      bearing_vector_2  Bearing vector to pts2 in camera 2
+ */
+void calibrateKeypoints(const std::vector<cv::Point2f>& pts1,
+                        const std::vector<cv::Point2f>& pts2,
+                        opengv::bearingVectors_t& bearing_vector_1,
+                        opengv::bearingVectors_t& bearing_vector_2) {
+    std::vector<cv::Point2f> points1_rect, points2_rect;
+    cv::undistortPoints(pts1, points1_rect, camera_params_.K, camera_params_.D);
+    cv::undistortPoints(pts2, points2_rect, camera_params_.K, camera_params_.D);
+
+    for (auto const& pt: points1_rect){
+      opengv::bearingVector_t bearing_vector(pt.x, pt.y, 1); // focal length is 1 after undistortion
+      bearing_vector_1.push_back(bearing_vector.normalized());
+    }
+
+    for (auto const& pt: points2_rect){
+      opengv::bearingVector_t bearing_vector(pt.x, pt.y, 1); // focal length is 1 after undistortion
+      bearing_vector_2.push_back(bearing_vector.normalized());
+    }
+}
+
+/**
+ * @brief      Update pose estimate using previous absolue pose and estimated relative pose
+ *
+ * @param[in]  prev_pose         ground-truth absolute pose of previous frame
+ * @param[in]  relative_pose     estimated relative pose between current frame and previous frame
+ * @param      output            estimated absolute pose of current frame
+ */
+void updatePoseEstimate(geometry_msgs::Pose const& prev_pose, geometry_msgs::Pose const& relative_pose, geometry_msgs::Pose& output) {
+  tf::Transform prev, relative;
+  tf::poseMsgToTF(prev_pose, prev);
+  tf::poseMsgToTF(relative_pose, relative);
+  tf::poseTFToMsg(prev*relative, output);
+}
+
+/**
+ * @brief      Given an estimated translation up to scale, return an absolute translation with correct scale using ground truth
+ *
+ * @param[in]  prev_pose         ground-truth absolute pose of previous frame
+ * @param[in]  curr_pose         ground-truth absolute pose of current frame
+ * @param      translation       estimated translation between current frame and previous frame
+ */
+void scaleTranslation(geometry_msgs::Point& translation, geometry_msgs::PoseStamped const& prev_pose, geometry_msgs::PoseStamped const& curr_pose) {
+  if (!FLAGS_scale_translation) return;
+  tf::Transform prev, curr;
+  tf::poseMsgToTF(prev_pose.pose, prev);
+  tf::poseMsgToTF(curr_pose.pose, curr);
+  tf::Transform const relative_pose = prev.inverseTimes(curr);
+  double const translation_scale = relative_pose.getOrigin().length();
+  if (isnan(translation_scale) || isinf(translation_scale)) {
+    ROS_WARN("Failed to scale translation");
+    return;
+  }
+  double const old_scale = sqrt(pow(translation.x, 2) + pow(translation.y, 2) + pow(translation.z, 2));
+  translation.x *= translation_scale / old_scale;
+  translation.y *= translation_scale / old_scale;
+  translation.z *= translation_scale / old_scale;
+}
+
+
+/** @brief     (TODO) Compute Relative Pose Error (RPE) in translation and rotation.
+    @param[in] gt_t_prev_frame ground-truth transform for previous frame.
+    @param[in] gt_t_curr_frame ground-truth transform for current frame.
+    @param[in] est_t_prev_frame estimated transform for previous frame.
+    @param[in] est_t_curr_frame estimated transform for current frame.
+*/
+void evaluateRPE(const tf::Transform& gt_t_prev_frame,
+                 const tf::Transform& gt_t_curr_frame,
+                 const tf::Transform& est_t_prev_frame,
+                 const tf::Transform& est_t_curr_frame) {
+  tf::Transform const est_relative_pose = est_t_prev_frame.inverseTimes(est_t_curr_frame);
+  tf::Transform const gt_relative_pose = gt_t_prev_frame.inverseTimes(gt_t_curr_frame);
+
+  tf::Vector3 t_est = est_relative_pose.getOrigin();
+  tf::Vector3 t_gt = gt_relative_pose.getOrigin();
+
+  if (FLAGS_pose_estimator < 3) {
+    if (t_est.length() > 1e-6) t_est.normalize();
+    if (t_gt.length() > 1e-6) t_gt.normalize();
+  }
+
+  double translation_error = t_gt.distance(t_est);
+
+  tf::Quaternion q_est = est_relative_pose.getRotation();
+  tf::Quaternion q_gt = gt_relative_pose.getRotation();
+
+  tf::Quaternion q_diff = q_gt.inverse() * q_est;
+  double rotation_error_rad = q_diff.getAngle(); 
+
+  double rotation_error_deg = rotation_error_rad * 180.0 / M_PI;
+
+  static std::ofstream log_file;
+  
+  if (!log_file.is_open()) {
+      std::string output_path = "/home/stanley/vnav_ws/src/lab6/log/";
+      std::string filename;
+
+      if (!FLAGS_use_ransac) {
+          filename = output_path + "rpe_with_no_ransac.csv";
+      } else {
+          switch(FLAGS_pose_estimator) {
+            case 0: filename = output_path + "rpe_5pt.csv"; break;
+            case 1: filename = output_path + "rpe_8pt.csv"; break;
+            case 2: filename = output_path + "rpe_2pt.csv"; break;
+            case 3: filename = output_path + "rpe_3pt.csv"; break;
+            default: filename = output_path + "rpe_unknown.csv"; break;
+          }
+      }
+
+      log_file.open(filename, std::ios::out | std::ios::trunc);
+
+      if (log_file.is_open()) {
+          log_file << "frame,trans_error,rot_error_deg" << std::endl;
+          std::cout << "[Lab6] Saving RPE logs to: " << filename << std::endl;
+      } else {
+          std::cerr << "[Lab6] Failed to open file: " << filename << std::endl;
+      }
+  }
+
+  static int frame_count = 0;
+  if (log_file.is_open()) {
+      log_file << frame_count << "," << translation_error << "," << rotation_error_deg << std::endl;
+  }
+  frame_count++;
+}
+
+/** @brief (TODO) This function is called when a new image is published. This is
+ *   where all the magic happens for this lab
+ *  @param[in]  rgb_msg    RGB Camera message
+ *  @param[in]  depth_msg  Depth Camera message
+ */
+void cameraCallback(const sensor_msgs::ImageConstPtr &rgb_msg, const sensor_msgs::ImageConstPtr &depth_msg) {
+  cv::Mat bgr, depth;
+
+  try {
+    bgr = cv_bridge::toCvShare(rgb_msg, "bgr8")->image;
+    depth = cv_bridge::toCvShare(depth_msg, depth_msg->encoding)->image;
+  } catch (cv_bridge::Exception &e) {
+    ROS_ERROR("Could not convert rgb or depth images.");
+  }
+
+  cv::Mat view = bgr.clone();
+
+  static cv::Mat prev_bgr = bgr.clone();
+  static cv::Mat prev_depth = depth.clone();
+
+  std::pair<std::vector<cv::KeyPoint>, std::vector<cv::KeyPoint>> matched_kp_1_kp_2;
+  feature_tracker_->track(prev_bgr, bgr, &matched_kp_1_kp_2);
+
+  int N = matched_kp_1_kp_2.first.size();
+  std::cout << "Matched " << N << " keypoints" << std::endl;
+  std::vector<cv::Point2f> pts1, pts2;
+  
+  cv::KeyPoint::convert(matched_kp_1_kp_2.first, pts1);
+  cv::KeyPoint::convert(matched_kp_1_kp_2.second, pts2);
+
+  opengv::bearingVectors_t bearing_vector_1, bearing_vector_2;
+
+  if (!pts1.empty()) {
+    calibrateKeypoints(pts1, pts2, bearing_vector_1, bearing_vector_2);
+  }
+
+  Adapter adapter_mono (bearing_vector_1, bearing_vector_2);
+
+  geometry_msgs::PoseStamped pose_estimation;
+  tf::poseTFToMsg(tf::Pose::getIdentity(), pose_estimation.pose);
+
+  geometry_msgs::Pose relative_pose_estimate = pose_estimation.pose;
+
+  switch(FLAGS_pose_estimator) {
+  case 0: {
+    // 5-points Algorithm
+    static constexpr size_t min_nr_of_correspondences = 5;
+    if (adapter_mono.getNumberCorrespondences() >= min_nr_of_correspondences) {
+      if (!FLAGS_use_ransac) {
+        std::shared_ptr<RansacProblem> ransac_problem = std::make_shared<RansacProblem>(adapter_mono, RansacProblem::NISTER);
+        opengv::sac::Ransac<RansacProblem> ransac;
+        ransac.sac_model_ = ransac_problem;
+        
+        ransac.max_iterations_ = 1; 
+        ransac.threshold_ = 100000.0;
+
+        if(ransac.computeModel()) {
+             relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+        } else {
+             ROS_WARN("5-point non-RANSAC failed");
+        }
+      } else {
+        std::shared_ptr<RansacProblem> ransac_problem = std::make_shared<RansacProblem>(adapter_mono, RansacProblem::NISTER);
+
+        opengv::sac::Ransac<RansacProblem> ransac;
+        ransac.sac_model_ = ransac_problem;
+
+        ransac.threshold_ = 0.00001;
+        ransac.max_iterations_ = 100;
+
+        ransac.computeModel();
+
+        relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+      }
+    } else {
+      ROS_WARN("Not enough correspondences to compute pose estimation using"
+               " Nister's algorithm.");
+    }
+    break;
+  }
+  case 1: {
+    // 8-points Algorithm
+    static constexpr size_t min_nr_of_correspondences = 8;
+
+    if (adapter_mono.getNumberCorrespondences() >= min_nr_of_correspondences) {
+      if (!FLAGS_use_ransac) {
+        std::shared_ptr<RansacProblem> ransac_problem = std::make_shared<RansacProblem>(adapter_mono, RansacProblem::EIGHTPT);
+        opengv::sac::Ransac<RansacProblem> ransac;
+        ransac.sac_model_ = ransac_problem;
+        
+        ransac.max_iterations_ = 1;
+        ransac.threshold_ = 100000.0;
+
+        if(ransac.computeModel()) {
+            relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+        }
+      } else {
+        std::shared_ptr<RansacProblem> ransac_problem = std::make_shared<RansacProblem>(adapter_mono, RansacProblem::EIGHTPT);
+        
+        opengv::sac::Ransac<RansacProblem> ransac;
+        ransac.sac_model_ = ransac_problem;
+
+        ransac.threshold_ = 0.00001;
+        ransac.max_iterations_ = 100;
+
+        ransac.computeModel();
+
+        relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+      }
+    } else {
+      ROS_WARN("Not enough correspondences to compute pose estimation using"
+               " Longuet-Higgins' algorithm.");
+    }
+    break;
+  }
+  case 2: {
+    // 2-point Algorithm
+    static constexpr size_t min_nr_of_correspondences = 2;
+    if (adapter_mono.getNumberCorrespondences() >= min_nr_of_correspondences) {
+      tf::Transform curr_frame, prev_frame;
+      tf::poseMsgToTF(curr_pose_.pose, curr_frame);
+      tf::poseMsgToTF(prev_pose_.pose, prev_frame);
+      Eigen::Matrix3d rotation;
+      tf::matrixTFToEigen(prev_frame.inverseTimes(curr_frame).getBasis(), rotation);
+      adapter_mono.setR12(rotation);
+
+      if (!FLAGS_use_ransac) {
+        std::shared_ptr<RansacProblemGivenRot> ransac_problem = std::make_shared<RansacProblemGivenRot>(adapter_mono);
+        opengv::sac::Ransac<RansacProblemGivenRot> ransac;
+        ransac.sac_model_ = ransac_problem;
+        
+        ransac.max_iterations_ = 1;
+        ransac.threshold_ = 100000.0;
+
+        if(ransac.computeModel()) {
+            relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+        }
+      } else {
+        std::shared_ptr<RansacProblemGivenRot> ransac_problem = std::make_shared<RansacProblemGivenRot>(adapter_mono);
+
+        opengv::sac::Ransac<RansacProblemGivenRot> ransac;
+        ransac.sac_model_ = ransac_problem;
+
+        ransac.threshold_ = 0.00001;
+        ransac.max_iterations_ = 100;
+        
+        ransac.computeModel();
+
+        relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+
+        // ***************************** end solution *****************************
+      }
+    } else {
+      ROS_WARN("Not enough correspondences to estimate relative translation using 2pt algorithm.");
+    }
+    break;
+  }
+  case 3: {
+    // Arun's 3-point algorithm
+    for (int i=0; i<N; i++) {
+      double d1 = double( prev_depth.at<float>(std::floor(pts1[i].y), std::floor(pts1[i].x)) ) ;
+      double d2 = double( depth.at<float>(std::floor(pts2[i].y), std::floor(pts2[i].x)) ) ;
+
+      bearing_vector_1[i] /= bearing_vector_1[i](2,0);
+      bearing_vector_2[i] /= bearing_vector_2[i](2,0);
+
+      bearing_vector_1[i] *= d1;
+      bearing_vector_2[i] *= d2;
+    }
+
+    opengv::points_t cloud_1, cloud_2;
+    for (auto i = 0ul; i < bearing_vector_1.size(); i++) {
+        cloud_1.push_back(bearing_vector_1[i]);
+        cloud_2.push_back(bearing_vector_2[i]);
+    }
+
+    Adapter3D adapter_3d(cloud_1, cloud_2);
+
+    static constexpr int min_nr_of_correspondences = 3; 
+    if (adapter_3d.getNumberCorrespondences() >= min_nr_of_correspondences) {
+      if (!FLAGS_use_ransac){
+        std::shared_ptr<RansacProblem3D> ransac_problem = std::make_shared<RansacProblem3D>(adapter_3d);
+        
+        opengv::sac::Ransac<RansacProblem3D> ransac;
+        ransac.sac_model_ = ransac_problem;
+
+        ransac.max_iterations_ = 1;
+        ransac.threshold_ = 1000.0;
+        
+        if(ransac.computeModel()) {
+             relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+        }
+      } else{
+        std::shared_ptr<RansacProblem3D> ransac_problem = std::make_shared<RansacProblem3D>(adapter_3d);
+
+        opengv::sac::Ransac<RansacProblem3D> ransac;
+        ransac.sac_model_ = ransac_problem;
+
+        ransac.threshold_ = 0.1; 
+        ransac.max_iterations_ = 100;
+
+        if(ransac.computeModel()) {
+             relative_pose_estimate = eigen2Pose(ransac.model_coefficients_);
+        }
+      }
+    } else {
+      ROS_WARN("Not enough correspondences to estimate absolute transform using Arun's 3pt algorithm.");
+    }
+    break;
+  }
+  default: {
+    ROS_ERROR("Wrong pose_estimator flag!");
+  }
+  }
+  if (FLAGS_pose_estimator < 3) {
+    scaleTranslation(relative_pose_estimate.position, prev_pose_, curr_pose_);
+  }
+  
+  updatePoseEstimate(prev_pose_.pose, relative_pose_estimate, pose_estimation.pose);
+
+  tf::Transform gt_t_prev_frame, gt_t_curr_frame;
+  tf::Transform est_t_prev_frame, est_t_curr_frame;
+  tf::poseMsgToTF(pose_estimation.pose, est_t_curr_frame);
+  tf::poseMsgToTF(curr_pose_.pose, gt_t_curr_frame);
+  tf::poseMsgToTF(prev_pose_.pose, est_t_prev_frame);
+  tf::poseMsgToTF(prev_pose_.pose, gt_t_prev_frame);
+
+  evaluateRPE(gt_t_prev_frame, gt_t_curr_frame,est_t_prev_frame,est_t_curr_frame);
+
+  pose_estimation.header.frame_id = "world";
+  pub_pose_estimation_.publish(pose_estimation);
+
+  prev_bgr = bgr.clone();
+  prev_depth = depth.clone();
+  prev_pose_ = curr_pose_;
+}
+
+int main(int argc, char** argv) {
+  google::InitGoogleLogging(argv[0]);
+  google::ParseCommandLineFlags(&argc, &argv, true);
+  google::InstallFailureSignalHandler();
+
+  ros::init(argc, argv, "keypoint_trackers");
+  ros::NodeHandle local_nh("~");
+  
+  camera_params_.K = cv::Mat::zeros(3, 3, CV_64F);
+  camera_params_.K.at<double>(0,0) = 415.69219381653056;
+  camera_params_.K.at<double>(1,1) = 415.69219381653056;
+  camera_params_.K.at<double>(0,2) = 360.0;
+  camera_params_.K.at<double>(1,2) = 240.0;
+  camera_params_.D = cv::Mat::zeros(cv::Size(5,1),CV_64F);
+
+  T_camera_body = cv::Mat::zeros(cv::Size(4,4),CV_64F);
+  T_camera_body.at<double>(0,2) = 1.0;
+  T_camera_body.at<double>(1,0) = -1.0;
+  T_camera_body.at<double>(1,3) = 0.05;
+  T_camera_body.at<double>(2,1) = -1.0;
+  T_camera_body.at<double>(3,3) = 1.0;
+  
+  R_camera_body = T_camera_body(cv::Range(0,3),cv::Range(0,3));
+  t_camera_body = T_camera_body(cv::Range(0,3),cv::Range(3,4));
+  pose_camera_body = cv2Pose(R_camera_body,t_camera_body);
+  
+  tf::poseMsgToTF(pose_camera_body, transform_camera_body);
+
+  feature_tracker_.reset(new TrackerWrapper());
+
+  auto pose_sub = local_nh.subscribe("/ground_truth_pose", 10, poseCallbackTesse);
+
+  image_transport::ImageTransport it(local_nh);
+  image_transport::SubscriberFilter sf_rgb(it, "/rgb_images_topic", 1);
+  image_transport::SubscriberFilter sf_depth(it, "/depth_images_topic", 1);
+
+  typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> MySyncPolicy;
+  message_filters::Synchronizer<MySyncPolicy> sync(MySyncPolicy(10), sf_rgb, sf_depth);
+  sync.registerCallback(cameraCallback);
+
+  pub_pose_gt_ = local_nh.advertise<geometry_msgs::PoseStamped>("/gt_camera_pose", 1);
+  pub_pose_estimation_ = local_nh.advertise<geometry_msgs::PoseStamped>("/camera_pose", 1);
+
+  while (ros::ok()) {
+    ros::spinOnce();
+    cv::waitKey(1);
+  }
+  cv::destroyAllWindows();
+
+  return EXIT_SUCCESS;
+}
+```
+
+- _*rpe_comparison.py*_
+<section:rpe_comparison_py>
+```py
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+path_ransac = '/home/stanley/vnav_ws/src/lab6/log/rpe_with_ransac.csv'
+path_no_ransac = '/home/stanley/vnav_ws/src/lab6/log/rpe_with_no_ransac.csv'
+
+df_ransac = pd.read_csv(path_ransac) if os.path.exists(path_ransac) else None
+df_no_ransac = pd.read_csv(path_no_ransac) if os.path.exists(path_no_ransac) else None
+
+fig, axs = plt.subplots(2, 1, figsize=(12, 10))
+
+# --- 1. 绘制平移误差 ---
+if df_ransac is not None:
+    axs[0].plot(df_ransac['frame'].to_numpy(), df_ransac['trans_error'].to_numpy(), label='With RANSAC', color='blue', alpha=0.7)
+
+if df_no_ransac is not None:
+    axs[0].plot(df_no_ransac['frame'].to_numpy(), df_no_ransac['trans_error'].to_numpy(), label='Without RANSAC', color='red', alpha=0.6)
+
+axs[0].set_title('Relative Translation Error (Direction)')
+axs[0].set_ylabel('Error (Euclidean dist)')
+axs[0].set_xlabel('Frame Index')
+axs[0].legend(
+    loc='upper right', 
+    bbox_to_anchor=(1.0, 1.0)
+)
+axs[0].grid(True)
+axs[0].set_ylim(0, 1.0) 
+
+# --- 2. 绘制旋转误差 ---
+if df_ransac is not None:
+    axs[1].plot(df_ransac['frame'].to_numpy(), df_ransac['rot_error_deg'].to_numpy(), label='With RANSAC', color='blue', alpha=0.7)
+
+if df_no_ransac is not None:
+    axs[1].plot(df_no_ransac['frame'].to_numpy(), df_no_ransac['rot_error_deg'].to_numpy(), label='Without RANSAC', color='red', alpha=0.6)
+
+axs[1].set_title('Relative Rotation Error')
+axs[1].set_ylabel('Error (Degrees)')
+axs[1].set_xlabel('Frame Index')
+axs[1].legend(
+    loc='upper right', 
+    bbox_to_anchor=(1.0, 1.0)
+)
+axs[1].grid(True)
+axs[1].set_ylim(0, 10)
+
+plt.tight_layout()
+plt.savefig('rpe_comparison.png', dpi=1200) 
+plt.show()
+```
+
+- _*algorithm_comparison.py*_
+<section:algorithm_comparison_py>
+```py
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+import numpy as np
+
+base_path = '/home/stanley/vnav_ws/src/lab6/log/'
+files = {
+    '5-Point (Nister)': os.path.join(base_path, 'rpe_5pt.csv'),
+    '8-Point (Longuet-Higgins)': os.path.join(base_path, 'rpe_8pt.csv'),
+    '2-Point (Known Rotation)': os.path.join(base_path, 'rpe_2pt.csv')
+}
+
+colors = {
+    '5-Point (Nister)': 'blue',
+    '8-Point (Longuet-Higgins)': 'green',
+    '2-Point (Known Rotation)': 'orange'
+}
+
+data_frames = {}
+for name, path in files.items():
+    if os.path.exists(path):
+        print(f"Loading {name} from {path}...")
+        data_frames[name] = pd.read_csv(path)
+    else:
+        print(f"[WARNING] File not found: {path}")
+
+if not data_frames:
+    print("No data found! Please check file paths.")
+    exit()
+
+fig, axs = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
+
+# --- 1. 绘制平移误差 (Translation Error) ---
+for name, df in data_frames.items():
+    frames = df['frame'].to_numpy()
+    trans_err = df['trans_error'].to_numpy()
+    
+    axs[0].plot(frames, trans_err, label=name, color=colors[name], alpha=0.7, linewidth=1.5)
+
+axs[0].set_title('Relative Translation Error Comparison', fontsize=14)
+axs[0].set_ylabel('Error (Euclidean Dist)', fontsize=12)
+axs[0].grid(True, which='both', linestyle='--', alpha=0.7)
+axs[0].legend(
+    loc='upper right',
+    bbox_to_anchor=(1.0, 1.0)
+)
+axs[0].set_ylim(0, 1.0) 
+
+# --- 2. 绘制旋转误差 (Rotation Error) ---
+for name, df in data_frames.items():
+    frames = df['frame'].to_numpy()
+    rot_err = df['rot_error_deg'].to_numpy()
+    
+    axs[1].plot(frames, rot_err, label=name, color=colors[name], alpha=0.7, linewidth=1.5)
+
+axs[1].set_title('Relative Rotation Error Comparison', fontsize=14)
+axs[1].set_ylabel('Error (Degrees)', fontsize=12)
+axs[1].set_xlabel('Frame Index', fontsize=12)
+axs[1].grid(True, which='both', linestyle='--', alpha=0.7)
+axs[1].legend(
+    loc='upper right',
+    bbox_to_anchor=(1.0, 1.0)
+)
+axs[1].set_ylim(0, 5.0)
+
+plt.tight_layout()
+
+output_file = 'algorithm_comparison.png'
+plt.savefig(output_file, dpi=1200)
+plt.show()
+```
+
+- _*arun_3d.py*_
+<section:arun_3d_py>
+```py
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+import numpy as np
+
+file_path = '/home/stanley/vnav_ws/src/lab6/log/rpe_3pt.csv'
+
+if os.path.exists(file_path):
+    print(f"Loading 3D-3D results from {file_path}...")
+    df = pd.read_csv(file_path)
+else:
+    print(f"[ERROR] File not found: {file_path}")
+    print("Please make sure you ran the simulation with pose_estimator=3")
+    exit()
+
+fig, axs = plt.subplots(2, 1, figsize=(10, 8), sharex=True)
+
+frames = df['frame'].to_numpy()
+trans_err = df['trans_error'].to_numpy()
+rot_err = df['rot_error_deg'].to_numpy()
+
+# --- 1. 绘制平移误差 (Translation Error) ---
+axs[0].plot(frames, trans_err, label='3-Point Arun (3D-3D)', color='purple', alpha=0.8, linewidth=1.5)
+
+axs[0].set_title('Arun\'s 3-Point Method: Translation Error', fontsize=14)
+axs[0].set_ylabel('Error (Meters)', fontsize=12)
+
+axs[0].grid(True, which='both', linestyle='--', alpha=0.7)
+axs[0].legend(
+    loc='upper right',
+    bbox_to_anchor=(1.0, 1.0)
+)
+
+axs[0].set_ylim(0, 0.5) 
+
+# --- 2. 绘制旋转误差 (Rotation Error) ---
+axs[1].plot(frames, rot_err, label='3-Point Arun (3D-3D)', color='purple', alpha=0.8, linewidth=1.5)
+
+axs[1].set_title('Arun\'s 3-Point Method: Rotation Error', fontsize=14)
+axs[1].set_ylabel('Error (Degrees)', fontsize=12)
+axs[1].set_xlabel('Frame Index', fontsize=12)
+axs[1].grid(True, which='both', linestyle='--', alpha=0.7)
+axs[1].legend(
+    loc='upper right',
+    bbox_to_anchor=(1.0, 1.0)
+)
+axs[1].set_ylim(0, 5.0) 
+
+plt.tight_layout()
+plt.savefig('arun_3d.png', dpi=1200)
+plt.show()
+```
