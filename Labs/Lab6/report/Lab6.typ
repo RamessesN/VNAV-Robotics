@@ -136,13 +136,26 @@
 
 /**************   Abstract   **************/
 #abstract[
-  ...
+  This report presents a comprehensive study on Visual Odometry algorithms for autonomous drone navigation. Utilizing the `OpenGV` library, we implemented and evaluated a suite of geometric solvers to estimate relative camera motion, including *Nistér’s 5-point algorithm*, *Longuet-Higgins’ 8-point algorithm*, and a *2-point minimal solver* assuming known rotation. We conducted a comparative analysis of these 2D-2D methods against Arun’s 3D-3D point cloud registration method using RGB-D data.
+
+  Our experiments demonstrate that robust outlier rejection via *RANSAC* is indispensable for reliable pose estimation in the presence of noisy feature correspondences. Furthermore, while monocular methods suffer from inherent scale ambiguity, the integration of depth information allows for the recovery of absolute trajectory scale with high accuracy. Finally, we evaluated the system on a custom high-speed drone racing dataset. The results highlight the performance degradation of geometric solvers under rapid motion and motion blur, emphasizing the critical dependency of backend estimation on frontend feature tracking quality.
 
   See Resources on #link("https://github.com/RamessesN/Robotics_MIT")[github.com/RamessesN/Robotics_MIT].
 ]
 
 /**************   Introduction   **************/
 = Introduction
+#indent[
+  State estimation is a fundamental prerequisite for the autonomous operation of Unmanned Aerial Vehicles, particularly in GPS-denied indoor environments. Visual Odometry provides a solution by estimating the agent's ego-motion through the analysis of consecutive image frames. In this lab, we explore the geometric foundations of VO, moving from 2D-2D epipolar geometry to 3D-3D rigid body registration.
+
+  The core objective of this report is to implement and benchmark different motion estimation strategies using the `OpenGV` library. The pipeline begins with feature extraction and matching (SIFT), followed by geometric verification. We address several key challenges in visual estimation:
+  + *Outlier Rejection:* Feature matching is prone to errors. We investigate the efficacy of Random Sample Consensus (RANSAC) in filtering spurious matches to preserve estimation integrity.
+  + *Minimal vs. Linear Solvers:* We compare the performance of the 5-point minimal solver against the linear 8-point algorithm, analyzing their stability under different conditions.
+  + *Sensor Fusion:* We implement a 2-point algorithm that leverages known rotation (simulating IMU integration) to reduce problem complexity.
+  + *Scale Recovery:* We address the scale ambiguity limitation of monocular vision by incorporating depth measurements, employing Arun’s method to solve for the absolute transformation.
+
+  Finally, we extend our evaluation beyond standard datasets to a challenging drone racing scenario. This stress test reveals the limitations of pure visual estimation in high-dynamic regimes and motivates the need for tightly-coupled Visual-Inertial Odometry systems.
+]
 
 /**************   Procedure   **************/
 = Procedure
@@ -495,11 +508,70 @@
   - *Stability:* The trajectory estimation is robust and does not exhibit the scale drift issues common in monocular VO systems, demonstrating the advantage of RGB-D sensors for indoor navigation.
 ]
 
+=== valuation on Drone Racing Dataset
+#indent[
+  #strong[Data Acquisition]
+
+  To further validate the robustness of our implemented algorithms, we recorded a custom dataset using the drone racing simulator environment. The dataset (`vnav-lab4-group31.bag`) involves high-speed maneuvers and complex trajectories, presenting a more challenging scenario than the provided `office.bag`.
+
+  #strong[Running Snapshot]
+
+  #figure(
+    image("img/running_result.png", width: 80%),
+    caption: [Drone Racing Dataset Running Result]
+  )
+
+  #strong[Performance Analysis]
+
+  We first evaluated the monocular algorithms (5-point, 8-point, and 2-point) on this custom dataset. The results are visualized below.
+
+  #figure(
+    image("img/algorithm_comparison_lab4.jpg", width: 70%),
+    caption: [Visualization of the 5-points, 8-points, 2-points Algorithms Translation and Rotation Errors Comparison on Self-Dataset]
+  )
+
+  _Analysis_ --- The results on the racing dataset highlight the limitations of classical geometric methods under aggressive motion:
+  - *Rotation:* The *2-point algorithm (Orange)* correctly maintains zero rotation error (bottom plot, flat line at 0), validating that our implementation correctly ingested the ground truth orientation. However, the *8-point algorithm (Green)* fails catastrophically in many frames, with rotation errors spiking to nearly 200 degrees. The *5-point algorithm (Blue)* performs slightly better but still exhibits significant instability compared to the static office scenario.
+  - *Translation:* All three methods show high translation errors. This degradation is likely caused by *motion blur* and *rapid viewpoint changes* typical in drone racing, which severely impact the quality of SIFT feature matching. When the feature tracker fails to provide high-quality correspondences, the geometric solvers cannot recover a reliable pose.
+
+  Furthermore, we tested the *3D-3D Arun's Method* to see if depth information could mitigate these issues.
+
+  #figure(
+    image("img/arun_3d_lab4.jpg", width: 70%),
+    caption: [Visualization of the Translation and Rotation Errors of Arun's Algorithm with RANSAC on Self-Dataset]
+  )
+
+  _Analysis_ --- Even with depth information and absolute scale recovery, Arun's method struggles to maintain a lock on the trajectory, as evidenced by the frequent spikes in both translation (reaching > 10 meters) and rotation errors.
+  - The periods of low error indicate that the algorithm works when the motion is smooth.
+  - However, the frequent large spikes confirm that *feature tracking is the bottleneck*. Since Arun's method relies on the same 2D feature correspondences as the monocular methods, if the 2D matches are incorrect (outliers ratio is too high for RANSAC to handle) or too few due to blur, the 3D registration will inevitably fail.
+  - This experiment demonstrates that while 3D-3D methods resolve scale ambiguity, they are not immune to the challenges of dynamic, high-speed flight.
+]
+
 /**************   Reflection and Analysis   **************/
 = Reflection and Analysis
+#indent[
+  Through the implementation and evaluation of various motion estimation algorithms, we have observed several key insights:
+
+  + Our experiments unequivocally demonstrated that RANSAC is not merely an optimization but a necessity. Without RANSAC, the presence of even a small fraction of mismatched keypoints (outliers) caused the algebraic solvers (like the 5-point algorithm) to produce erratic and unusable pose estimates. RANSAC effectively acts as a filter, ensuring that the geometric model is derived only from consistent scene structure.
+
+  + *Algorithm Trade-offs (5-point vs. 8-point vs. 2-point):* \
+    - The *5-point Nistér algorithm* generally outperformed the *8-point algorithm* in terms of stability. This aligns with theory, as the 5-point method enforces the internal constraints of the essential matrix ($"det"(E)=0, 2E E^T E - "trace"(E E^T)E = 0$), making it more robust to noise and degenerate planar configurations common in indoor environments.
+    - The *2-point algorithm* demonstrated the power of sensor fusion. By decoupling rotation (assumed known from IMU/GT) from translation, the problem complexity drops significantly. However, our Bonus experiment showed that even with perfect rotation, translation estimation is still highly sensitive to feature tracking quality.
+
+  + Monocular methods (2D-2D) suffer from inherent scale ambiguity. In our visualizations, we had to "cheat" by scaling the translation vector using ground truth. This limitation renders monocular VO insufficient for autonomous navigation without external references (like an IMU or a known object size). In contrast, *Arun's Method (3D-3D)* utilizing RGB-D data successfully recovered the absolute scale, providing metric state estimation essential for real-world robotics.
+
+  + While the algorithms performed flawlessly on the slow-moving `office.bag`, they failed catastrophically on the high-speed racing dataset, which highlights a fundamental bottleneck: *Geometric solvers are only as good as the upstream feature tracker.* High-speed motion causes *motion blur* and rapid viewpoint changes, leading to poor SIFT matching. When the input correspondences are corrupted beyond the breakdown point of RANSAC, no geometric solver can recover the correct pose.
+]
 
 /**************   Conclusion   **************/
 = Conclusion
+#indent[
+  In this lab, we successfully implemented a comprehensive suite of motion estimation algorithms, ranging from monocular epipolar geometry (5-point, 8-point) to RGB-D point cloud registration (Arun's method). We integrated these solvers into a ROS-based pipeline and evaluated their performance using Relative Pose Error (RPE) metrics.
+
+  Our results confirmed that the *5-point algorithm with RANSAC* serves as a robust standard for monocular settings, while *Arun's method* leverages depth information to provide superior accuracy with recovered scale. Furthermore, the contrast between the successful office test and the challenging racing test underscored the limitations of pure vision systems in high-dynamic scenarios.
+
+  This lab provided a solid foundation in geometric computer vision. Moving forward, to address the drift observed in long trajectories and the failures in high-speed motion, future work would involve implementing Visual-Inertial Odometry to bridge tracking gaps and *Loop Closure* to correct accumulated drift, paving the way for a full SLAM system.
+]
 
 #pagebreak()
 
