@@ -809,6 +809,34 @@
   [INFO] [1766308353.398518896]: LK Stats: Matches: 653 Inliers: 634 Ratio: 0.970904
   ```
 
+  We have the updating table as follows:
+  #figure(
+    table(
+      columns: (auto, auto, auto, auto, auto, auto),
+      inset: 5pt,
+      align: center + horizon,
+      table.cell(
+        colspan: 1,
+        rowspan: 2,
+        [*Statistics*],
+      ),
+      table.cell(
+        colspan: 5,
+        [*Approach for Dataset (Video)*],
+      ),
+
+      [*SIFT*], [*SURF*], [*ORB*], [*FAST*], [*Lucas-Kanade*],
+      
+      [*\# of Keypoints 1*], [321.8], [389.4], [268.7], [741.1], [776], 
+      [*\# of Keypoints 2*], [321.6], [389.2], [268.6], [741.2], [776],
+      [*\# of Matches*],     [321.8], [389.4], [268.7], [741.1], [776],
+      [*\# of Good Matches*],[160.9], [234.5], [166.0], [499.0], [776],
+      [*\# of Inliers*],     [149.7], [216.9], [160.5], [465.6], [756],
+      [*Inlier Ratio*],      [92.8%], [92.6%], [96.4%], [92.8%], [97.4%],
+    ),
+    caption: [Performance Comparison: Descriptor Matching vs. Optical Flow],
+  )
+
   #line(length: 100%, stroke: (dash: "dashed"))
 
   #strong[Analysis and Observations:]
