@@ -167,7 +167,7 @@
 ]
 
 #indent[
-  ...
+  Based on the top-left block (Pose-Pose block) of the spy plot in `spy_game2.png`, there are **5** distinct diagonal blocks. Therefore, there are **5 robot poses**.
 ]
 
 #boldify[
@@ -175,7 +175,7 @@
 ]
 
 #indent[
-  ...
+  Based on the bottom-right block (Landmark-Landmark block), there are **6** distinct diagonal blocks. Therefore, there are **6 landmarks**.
 ]
 
 #boldify[
@@ -183,7 +183,7 @@
 ]
 
 #indent[
-  ...
+  The current pose corresponds to the last row (5th row) of the pose block. Looking at the off-diagonal block (top-right), there are **3** dark cells in this row. Thus, the current pose observed **3 landmarks** (specifically landmarks 4, 5, and 6).
 ]
 
 #boldify[
@@ -191,7 +191,12 @@
 ]
 
 #indent[
-  ...
+  By counting the number of dark blocks in each row of the top-right quadrant:
+  - Pose 1: 1 landmark
+  - Pose 2: 2 landmarks
+  - **Pose 3, Pose 4, and Pose 5**: Each observed **3 landmarks**.
+  
+  Therefore, **Poses 3, 4, and 5** tie for the most observations.
 ]
 
 #boldify[
@@ -199,7 +204,7 @@
 ]
 
 #indent[
-  ...
+  Locating the 2nd column in the landmark section (top-right quadrant), there are dark blocks corresponding to **Pose 2 and Pose 3**. Thus, these two poses observed the 2nd landmark.
 ]
 
 #boldify[
@@ -207,7 +212,7 @@
 ]
 
 #indent[
-  ...
+  Marginalizing out the 2nd landmark will create a fill-in (dependency) between all poses that observed it. Since Pose 2 and Pose 3 observed Landmark 2, marginalizing it will strengthen the connection between **Pose 2 and Pose 3**. Since these poses are already sequentially connected ($P_{k-1}$ to $P_k$), the block structure will remain largely visually similar, but the density within the Pose 2-3 block will increase.
 ]
 
 #boldify[
@@ -215,7 +220,7 @@
 ]
 
 #indent[
-  ...
+  Marginalizing out past poses (filtering approach) causes the information matrix to become **dense (fully connected)**. Eliminating a pose induces correlations between all landmarks observed by that pose and the subsequent pose. Repeating this process entangles all historic landmarks, destroying the sparse structure.
 ]
 
 #boldify[
@@ -223,7 +228,7 @@
 ]
 
 #indent[
-  ...
+  Marginalizing out the **landmarks** (Schur complement on structure) preserves the sparsity pattern. This results in the "Reduced Camera System" matrix, which typically retains a **band-diagonal sparse structure**, as poses are only connected to other poses with which they share common landmark observations (usually temporal neighbors).
 ]
 
 #boldify[
@@ -235,7 +240,9 @@
 ]
 
 #indent[
-  ...
+  - **Left Figure (Band-Diagonal):** The non-zero elements are concentrated strictly around the main diagonal. This indicates that the robot was likely **exploring a large environment (e.g., a long corridor) without revisiting** previous locations. Current poses only share information with spatially/temporally adjacent poses.
+  
+  - **Right Figure (Off-Diagonal / Loop Closures):** There are significant non-zero blocks far from the main diagonal (the "wings" in the corners). This indicates **Loop Closures**, where the current pose observes the same scene as a much earlier pose. This suggests the robot was likely **surveying a small room** or circling back to a previously visited area.
 ]
 
 === Well-begun is Half Done
@@ -324,6 +331,123 @@
 
 /**************   Team Work   **************/
 == Team Work
+
+=== Prepare the Dataset
+
+#indent[
+  Download the datasets, then run them via the commands below:
+
+  #align(center,
+    math.cases(
+      text(size: 1.5em, `./run_docker.sh orbslam:latest`),
+      text(size: 1.5em, `./run_docker.sh kimera:latest`)
+    )
+  )
+
+  Then, we can see the running results as follows:
+
+  #figure(
+    grid(
+      columns: 2,
+      gutter: 1em,
+      image("img/orbslam.png"),
+      image("img/kimera.png")
+    ),
+    caption: [*orbslam* & *kimera* Running Snapshot]
+  )
+]
+
+=== Performance Comparison
+
+#indent[
+  After running the `fix_timestamps.py` to fix the timestamps of the trajectory files, then use `evo_traj` to compare *OrbSlam* and *Kimera*:
+  
+  `evo_traj tum output/kimera/kimera.txt output/orbslam/orb_slam3.txt --plot`
+
+  And we have
+
+  #figure(
+    box(
+      width: 85%,
+      grid(
+        columns: 2,
+        gutter: 1em,
+
+        image("img/ko_trajectories_without_align.PNG"),
+        image("img/ko_xyz_without_align.PNG"),
+
+        image("img/ko_rpy_without_align.PNG"),
+        image("img/ko_speeds_without_align.PNG")
+      )
+    ),
+    caption: [*OrbSlam / Kimera* (without aligning) Performance Comparison]
+  )
+
+  From the figures above, it can be seen that without alignment, the trajectories of *Kimera* (blue) and *OrbSlam3* (green) are spatially distinct, which is expected. The *3D Trajectory* and *XYZ* plots show different starting origins and orientations, indicating that each algorithm initialized its own local world coordinate frame at startup. The *RPY* plot confirms a significant constant offset in Yaw (approx. $150^"o"$ difference), while Roll and Pitch are more consistent due to gravity alignment. However, the *Speed* plot demonstrates high consistency in velocity estimation, proving that both algorithms are capturing the drone's dynamics correctly despite the coordinate frame mismatch.
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  After aligning the trajectories through `evo_traj euroc ~/datasets/vnav/MH_01_easy/mav0/state_groundtruth_estimate0/data.csv --save_as_tum` and then we run the comparison  `evo_traj tum output/kimera/kimera.txt output/orbslam/orb_slam3.txt --ref data.tum --plot --align` to compare them:
+
+  #figure(
+    box(
+      width: 85%,
+      grid(
+        columns: 2,
+        gutter: 1em,
+
+        image("img/ko_trajectories.JPG"),
+        image("img/ko_xyz.JPG"),
+
+        image("img/ko_rpy.JPG"),
+        image("img/ko_speeds.JPG")
+      )
+    ),
+    caption: [*OrbSlam / Kimera* Performance Comparison]
+  )
+
+  From the aligned results above, it can be seen that after performing alignment against the Ground Truth, the estimated trajectories from both *Kimera* and *OrbSlam3* closely match the reference path. The *3D Trajectory* and *XYZ* plots show minimal drift, with both algorithms successfully tracking the complex motion of the MAV. The *RPY* plots indicate precise attitude estimation, accurately capturing rapid orientation changes. In the *Speed* plot, although both estimates contain typical high-frequency noise inherent to IMU-based prediction, they accurately follow the velocity profile of the ground truth. Overall, both systems demonstrate reliable state estimation performance on the EuRoC dataset.
+]
+
+=== LDSO
+
+#indent[
+  We successfully ran the LDSO (LiDAR-Direct-Sparse-Odometry) pipeline on the EuRoC dataset. As shown in the snapshot below, the viewer visualizes the sparse 3D point cloud reconstructed from the environment, along with the active keyframes and the current camera pose. The semi-dense reconstruction clearly outlines the structural features of the Machine Hall.
+
+  #figure(
+    image("./img/LDSO.png", width: 80%),
+    caption: [*LDSO* Running Snapshot]
+  )
+
+  Since LDSO is a *monocular* direct visual odometry method, it inherently suffers from *scale ambiguity* (i.e., it cannot observe the absolute metric scale of the world). Therefore, when comparing its trajectory against the Ground Truth and stereo/VIO pipelines (Kimera and OrbSlam3), it is mandatory to use Sim3 alignment (alignment with rotation, translation, and *scale correction*). We enabled this using the `--correct_scale` flag in `evo`.
+
+  #figure(
+    box(
+      width: 85%,
+      grid(
+        columns: 2,
+        gutter: 1em,
+
+        image("img/LDSO_trajectories.png"),
+        image("img/LDSO_xyz.png"),
+
+        image("img/LDSO_rpy.png"),
+        image("img/LDSO_speeds.png")
+      )
+    ),
+    caption: [*OrbSlam / Kimera / LDSO* Performance Comparison]
+  )
+  
+  From the comparison plots above, several observations can be made:
+
+  1. *Trajectories:* After applying scale correction, the LDSO trajectory (blue line, labeled `results_final`) aligns remarkably well with the Ground Truth (`data`), Kimera, and OrbSlam3. This demonstrates that despite lacking IMU data and stereo baselines, the direct photometric optimization of LDSO is capable of recovering the geometric structure of the camera path with high accuracy in feature-rich environments like EuRoC.
+
+  2. *XYZ:* The LDSO trajectory appears quite smooth, particularly in the XYZ position plots. Direct methods often benefit from using information from all pixels with sufficient gradient, which can result in robust tracking even when specific corner features might be sparse, although it can be sensitive to photometric calibration and lighting changes.
+
+  3. *RPY:* The Roll, Pitch, and Yaw estimates of LDSO track the ground truth variations accurately. However, unlike VIO methods (Kimera/OrbSlam3) which have an observable gravity vector from the accelerometer to constrain Roll and Pitch, monocular VO can sometimes exhibit slow drift in these axes over long durations. In this sequence, however, LDSO maintains its orientation stability effectively.
+
+  4. *Speeds:* The velocity profile derived from the aligned LDSO trajectory matches the VIO pipelines. This confirms that the temporal consistency of the estimated pose is preserved, meaning the "virtual speed" in the scaled monocular frame corresponds linearly to the real-world speed after Sim3 alignment.
+]
 
 /**************   Reflection and Analysis   **************/
 = Reflection and Analysis
