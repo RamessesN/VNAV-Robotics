@@ -167,7 +167,9 @@
 ]
 
 #indent[
-  Based on the top-left block (Pose-Pose block) of the spy plot in `spy_game2.png`, there are **5** distinct diagonal blocks. Therefore, there are **5 robot poses**.
+  From the matrix structure, the top-left block corresponds to the Pose-Pose constraints ($H_"pp"$), as it exhibits the sequential band structure typical of odometry. \
+  $because$ There are 8 blocks along the diagonal of the $H_"pp"$ matrix. \
+  $therefore$ There are 8 Robot Poses.
 ]
 
 #boldify[
@@ -175,7 +177,9 @@
 ]
 
 #indent[
-  Based on the bottom-right block (Landmark-Landmark block), there are **6** distinct diagonal blocks. Therefore, there are **6 landmarks**.
+  From the bottom-right block, which corresponds to $H_"ll"$, the relationship of Landmark-Landmark. \
+  $because$ There are 12 non-zero blocks along the diagonal of this section \
+  $therefore$ There are 12 Landmarks.
 ]
 
 #boldify[
@@ -183,7 +187,10 @@
 ]
 
 #indent[
-  The current pose corresponds to the last row (5th row) of the pose block. Looking at the off-diagonal block (top-right), there are **3** dark cells in this row. Thus, the current pose observed **3 landmarks** (specifically landmarks 4, 5, and 6).
+  Focus on the last row of the top-right block (corresponding to Pose 8). \
+  This block represents the Pose-Landmark constraints ($H_"pl"$). \
+  $because$ There are 5 non-zero blocks in this row within the landmark section. \
+  $therefore$ The current pose has observed 5 landmarks.
 ]
 
 #boldify[
@@ -191,12 +198,9 @@
 ]
 
 #indent[
-  By counting the number of dark blocks in each row of the top-right quadrant:
-  - Pose 1: 1 landmark
-  - Pose 2: 2 landmarks
-  - **Pose 3, Pose 4, and Pose 5**: Each observed **3 landmarks**.
-  
-  Therefore, **Poses 3, 4, and 5** tie for the most observations.
+  Check the rows in the top-right block ($H_"pl"$) to see how many landmarks each pose observes. \
+  $because$ The last row (corresponding to Pose 8) has the maximum number of non-zero blocks (5 blocks). \
+  $therefore$ Pose 8 has observed the most number of landmarks.
 ]
 
 #boldify[
@@ -204,7 +208,12 @@
 ]
 
 #indent[
-  Locating the 2nd column in the landmark section (top-right quadrant), there are dark blocks corresponding to **Pose 2 and Pose 3**. Thus, these two poses observed the 2nd landmark.
+  Locate the column corresponding to the 2nd landmark in the top-right block ($H_"pl"$). \
+  This column is part of the first vertical group of non-zero blocks. \
+  Checking the rows corresponding to this group:
+    - Row 1, 2, and 3 contain non-zero blocks.
+    - Row 4 onwards is empty for this column.
+  $therefore$ The 2nd landmark has been observed by Pose 1, Pose 2, and Pose 3.
 ]
 
 #boldify[
@@ -212,7 +221,38 @@
 ]
 
 #indent[
-  Marginalizing out the 2nd landmark will create a fill-in (dependency) between all poses that observed it. Since Pose 2 and Pose 3 observed Landmark 2, marginalizing it will strengthen the connection between **Pose 2 and Pose 3**. Since these poses are already sequentially connected ($P_{k-1}$ to $P_k$), the block structure will remain largely visually similar, but the density within the Pose 2-3 block will increase.
+  _Conclusion_ --- The mapped matrix should be like this:
+
+  #set math.equation(numbering: none)
+  #set math.mat(column-gap: 0.8em)
+  $ mat(
+    augment: #(hline: 8, vline: 8),
+    align: #center,
+    1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+    1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0;
+    1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0;
+    0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0;
+    0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0;
+    0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1;
+    1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+    0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0;
+    0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0;
+    0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0;
+    0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0;
+    0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0;
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0;
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+  ) $
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  *$section$ Proof:* \
+  After marginalizing out the 2nd feature, the row and column corresponding to the 2nd feature will be removed, and a  fill-in will occur in the top-left block ($H_"pp"$). Since the 2nd feature connects Pose 1, Pose 2, and Pose 3, these three poses will become fully connected (forming a dense $3 crossmark 3$ block). Besides, in the top-right ($H_"pl"$) and bottom-left ($H_"lp"$) blocks, the column/row corresponding to the 2nd feature is deleted, and all subsequent columns/rows (Landmark 3 to 12) shift to the left/up to fill the gap.
 ]
 
 #boldify[
@@ -220,7 +260,33 @@
 ]
 
 #indent[
-  Marginalizing out past poses (filtering approach) causes the information matrix to become **dense (fully connected)**. Eliminating a pose induces correlations between all landmarks observed by that pose and the subsequent pose. Repeating this process entangles all historic landmarks, destroying the sparse structure.
+  _Conclusion_ --- The sparsity pattern should be a full matrix of ones:
+
+  #set math.equation(numbering: none)
+  #set math.mat(column-gap: 0.8em)
+  $ mat(
+    augment: #(hline: 1, vline: 1), 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1;
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+  ) $
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  *$section$ Proof:* \
+  Predict the sparsity pattern after marginalizing out past poses (Pose 1 to Pose 7), keeping only Pose 8 and all landmarks: *1)* The matrix reduces to size $13 times 13$ (1 Pose + 12 Landmarks). *2)* Marginalizing the trajectory (the "backbone" connecting landmarks) creates direct correlations between all remaining variables. *3)* The information matrix becomes fully dense:
+    - The remaining pose ($P_8$) becomes correlated with all landmarks.
+    - All landmarks become correlated with each other (the $H_{"ll"}$ block becomes dense).
 ]
 
 #boldify[
@@ -228,7 +294,12 @@
 ]
 
 #indent[
-  Marginalizing out the **landmarks** (Schur complement on structure) preserves the sparsity pattern. This results in the "Reduced Camera System" matrix, which typically retains a **band-diagonal sparse structure**, as poses are only connected to other poses with which they share common landmark observations (usually temporal neighbors).
+  _Conclusion_ --- To preserve the sparsity pattern (avoid creating new non-zero blocks where there were zeros), we should chose a variable whose marginalization does not introduce new edges between previously unconnected nodes, and that is the *12th Landmark*.
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  *$section$ Proof:* \
+  *1)* Looking at the last column of the matrix, the 12th landmark is observed by only one pose (Pose 8). *2)* Marginalizing a variable connects all its neighbors to each other. Since the 12th landmark has only one neighbor (Pose 8), there are no distinct pairs of nodes to connect. *3)* The information from the landmark is simply folded into the diagonal block of Pose 8. No new fill-in entries are created in the matrix.
 ]
 
 #boldify[
@@ -240,9 +311,14 @@
 ]
 
 #indent[
-  - **Left Figure (Band-Diagonal):** The non-zero elements are concentrated strictly around the main diagonal. This indicates that the robot was likely **exploring a large environment (e.g., a long corridor) without revisiting** previous locations. Current poses only share information with spatially/temporally adjacent poses.
-  
-  - **Right Figure (Off-Diagonal / Loop Closures):** There are significant non-zero blocks far from the main diagonal (the "wings" in the corners). This indicates **Loop Closures**, where the current pose observes the same scene as a much earlier pose. This suggests the robot was likely **surveying a small room** or circling back to a previously visited area.
+  _Conclusion_ --- The left figure corresponds to surveying a small room and the right figure corresponds to exploring a large building.
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  *$section$ Proof:* \
+  The left matrix is very dense (density 0.40). Marginalizing landmarks creates connections between poses that observe the same features. A dense matrix indicates that nearly all poses share a high number of common observations (co-visibility). This happens when the robot is confined in a small space, looking at the same scene repeatedly from slightly different angles.
+
+  The right matrix is sparse (density 0.014) with a dominant diagonal band and specific off-diagonal blocks. The *diagonal band* represents the sequential motion (odometry), where the robot mostly sees new features as it moves forward. While the *off-diagonal blocks* represent loop closures. These occur when the robot revisits a previously mapped area, creating constraints between the current pose and distant past poses. This structure is typical of large-scale trajectories where the robot explores new areas and occasionally returns to old ones.
 ]
 
 === Well-begun is Half Done
@@ -254,7 +330,9 @@
 ]
 
 #indent[
-  ...
+  _Approach_ --- Construct a *Shortest Path Spanning Tree* (e.g., using Breadth-First Search) rooted at the first pose, and initialize all other poses by propagating measurements along the edges of this tree.
+
+  _Rationale_ --- This minimizes the number of relative transformations (edges) composed to reach any given node (utilizing loop closures as "shortcuts"), thereby significantly reducing the accumulated drift compared to the long sequential odometry chain.
 ]
 
 === Feature-based methods for SLAM
@@ -268,7 +346,11 @@
 ]
 
 #indent[
-  ...
+  - *Map Initialization:* This module computes the initial camera pose and map structure from two frames by automatically selecting between a homography model for planar scenes and a fundamental matrix for general scenes.
+  - *Tracking:* This thread localizes the camera in every frame by matching features to the local map and decides when to insert a new keyframe into the system.
+  - *Local Mapping:* This thread processes new keyframes to optimize the local reconstruction via bundle adjustment and performs culling of redundant map points and keyframes.
+  - *Loop Closing:* This thread searches for loops with every new keyframe to detect drift and corrects the map by performing a pose graph optimization over the Essential Graph.
+  - *Place Recognition:* This embedded module uses a bag-of-words visual vocabulary to efficiently perform loop detection and global relocalization when tracking is lost.
 ]
 
 #boldify[
@@ -276,7 +358,15 @@
 ]
 
 #indent[
-  ...
+  ORB-SLAM employs a two-step mechanism to ensure the validity of the loop closure:
+    - *Temporal/Geometric Consistency Check*: The system must *continuously detect three consistent closed-loop candidates* (that is, these three candidate keyframes are interconnected in the common view) before accepting the position of this closed-loop candidate, thereby eliminating accidental incorrect matches.
+    - *Geometric Verification (`Sim(3)` Transformation)*: For the candidates that pass the initial screening, the system will use the RANSAC algorithm to calculate the *`Sim(3)` transformation* between the current keyframe and the closed-loop keyframe. Only when this transformation is supported by *sufficiently many inliers*, will this closed-loop be finally accepted.
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  The role of pose graph optimization is to *distribute* the accumulated errors from the closed loop throughout the entire graph. If an incorrect closed loop (i.e., an incorrect geometric constraint) is included:
+    - The optimizer will attempt to minimize the cost function that includes this erroneous constraint, forcing the actually irrelevant keyframes to be brought closer or aligned.
+    - This will result in *severe map corruption/distortion*, as the originally correct trajectory will be distorted to fit this erroneous constraint, thereby destroying the global consistency.
 ]
 
 === Direct methods for SLAM
@@ -290,7 +380,23 @@
 ]
 
 #indent[
-  ...
+  - *Tracking:* This module estimates the rigid body pose `se(3)` of the new image relative to the current key frame by using the pose of the previous frame as the initial value and employing the Direct Image Alignment algorithm.
+  - *Depth Map Estimation:* This module utilizes the tracked frames and conducts numerous pixel-level small-baseline stereo comparisons to refine the depth map of the current key frame, or create a new key frame when the camera has moved too far.
+  - *Map Optimization:* This module continuously optimizes the pose graph composed of keyframes in the background. It detects loops and scale drift through direct `Sim(3)` image alignment and performs global consistency optimization.
+
+  #line(length: 100%, stroke: (dash: "dashed"))
+
+  #strong[Similarities]
+  - *Real-time monocular system:* Both are SLAM systems based on monocular cameras and capable of running in real-time on the CPU.
+  - *Keyframe architecture:* Both of them adopt a keyframe-based approach instead of filtering each frame individually.
+  - *Pose graph optimization:* Both use pose graph optimization (such as `g2o`) to maintain the global consistency of the map.
+  - *Handling scale drift:* For the scale drift problem in monocular SLAM, both methods utilize the `Sim(3)` transformation (including the scale factor) for loop closure correction and optimization.
+
+  #strong[Differences]
+  - *Methodology*: *LSD-SLAM* is a direct method that directly estimates the pose and geometry by minimizing the photometric error on the pixel intensities of the images. While *ORB-SLAM* is a feature-based method. It calculates by extracting and matching ORB feature points and minimizing the re-projection error.
+  - *Map Density:* *LSD-SLAM* generates semi-dense (densely populated in gradient areas) depth maps. While *ORB-SLAM* generates a sparse point cloud map.
+  - *Initialization:* *LSD-SLAM* can be initialized from a random depth map and relies on subsequent motion convergence. While *ORB-SLAM* has a dedicated automatic initialization step, which constructs the initial map by performing parallel computations of the homography matrix and the fundamental matrix.
+  - *Loop Detection*: *LSD-SLAM* relies on appearance-based algorithms to propose candidates and verifies the closed loop through "reciprocal tracking check". While *ORB-SLAM* employs the position recognition module based on the bag-of-words model (`DBoW2`) for loop closure detection and repositioning.
 ]
 
 #boldify[
@@ -298,7 +404,15 @@
 ]
 
 #indent[
-  ...
+  Feature-based approaches such as ORB-SLAM are generally considered to be more robust to lighting variations and occlusions.
+
+  #strong[Robustness to Illumination]
+  - *Feature-based appr:* The feature-based approach uses feature descriptors (such as ORB), which are designed to have good invariance to illumination and viewpoint changes. This means that even if the overall brightness of the image changes, the feature points can still be correctly matched.
+  - *Direct appr:* The direct method (such as LSD-SLAM) is based on the "photometric consistency assumption" (i.e., the assumption that the pixel intensity of the same point in the scene remains unchanged between different frames). This makes them susceptible to automatic gain, automatic exposure adjustment, and roll shutter ghosting. Although it can be alleviated by an affine illumination model, it is usually less stable than the feature-based method under drastic illumination changes. 
+
+  #strong[Robustness to Occlusions]
+  - *Feature-based appr:* The feature-based method supports wide baseline matching. When occlusion occurs, even if some feature points are lost or wrongly matched, algorithms such as RANSAC can effectively eliminate outliers and use the remaining correct matching points to restore the pose.
+  - *Direct appr:* The direct method is usually limited by a narrower baseline. It has higher requirements for the continuity between images. Although robust kernel functions (such as Huber norm) are used to handle outliers , large-scale occlusion can significantly disrupt the optimization terrain of photometric errors and easily lead to tracking failure.
 ]
 
 === From landmark-based SLAM to rotation estimation
