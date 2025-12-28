@@ -131,18 +131,32 @@
   author-name: "Yuwei ZHAO",
   author-id: "23020036096",
   group: "Group #31",
-  date: "2025-12-27",
+  date: "2025-12-28",
 )
 
 /**************   Abstract   **************/
 #abstract[
-  ...
-
+  This report presents a comprehensive study of Simultaneous Localization and Mapping (SLAM), encompassing both theoretical analysis of optimization structures and practical evaluation of the pipelines. \
+  *1)* The theoretical component investigates the sparsity patterns of the SLAM information matrix, mathematically demonstrating that marginalizing landmarks or poses induces "fill-in," which transforms linear-complexity sparse problems into cubic-complexity dense problems. \
+  *2)* The practical component evaluates three distinct SLAM paradigms—ORB-SLAM3 (Feature-based), Kimera (Visual-Inertial), and LDSO (Direct Monocular)—using the *EuRoC* dataset. Experimental results indicate that while feature-based methods offer superior robustness to illumination changes via invariant descriptors, direct methods achieve high-fidelity semi-dense reconstructions by exploiting photometric consistency. Furthermore, the comparison highlights the inherent scale ambiguity of monocular direct methods compared to metric-scaled VIO systems. \
   See Resources on #link("https://github.com/RamessesN/Robotics_MIT")[github.com/RamessesN/Robotics_MIT].
 ]
 
 /**************   Introduction   **************/
 = Introduction
+
+#indent[
+  Simultaneous Localization and Mapping (SLAM) constitutes the backbone of modern autonomous navigation, enabling robots to construct maps of unknown environments while estimating their trajectory. However, implementing robust SLAM systems requires addressing significant challenges, ranging from the high computational complexity of non-linear optimization (Bundle Adjustment) to the trade-offs between different visual processing paradigms.
+
+  First, we delve into the *theoretical underpinnings* of graph-based SLAM. By analyzing the "Spy plots" of information matrices, we examine the structural consequences of variable elimination (marginalization). We provide a formal proof that reducing a landmark-based SLAM problem to a rotation-only problem, while reducing the number of variables, results in a loss of sparsity (fill-in). This analysis explains why preserving the sparse block structure is crucial for real-time performance.
+
+  Second, we perform a *comparative experimental analysis* of three leading SLAM frameworks on the EuRoC Machine Hall dataset:
+  - *ORB-SLAM3:* A representative of feature-based (indirect) methods, which prioritizes robust tracking using invariant feature descriptors.
+  - *Kimera:* A Visual-Inertial Odometry (VIO) system that fuses IMU data to ensure metric-accurate tracking and gravity alignment.
+  - *LDSO (LiDAR-Direct-Sparse-Odometry):* A Direct method that minimizes photometric error to recover semi-dense geometry, offering a contrast to the sparse maps of feature-based approaches.
+
+  By evaluating trajectory accuracy (via `evo` tools), map quality, and system robustness, we clarify the distinct advantages of direct versus indirect methods and the critical role of mathematical sparsity in solver efficiency.
+]
 
 /**************   Procedure   **************/
 = Procedure
@@ -432,7 +446,39 @@
 ]
 
 #indent[
-  ...
+  Proof: \
+  $because$ Euclidean norm possesses rotational invariance, which means for any rotation matrix $R$ and vector $v$, we have 
+  $ cases(
+    ||R v||_2^2 = ||v||_2^2,
+    ||R^T v||_2^2 = ||v||_2^2
+  )$
+
+  $therefore$ For each term of the polynomial, we have \
+  #strong[Landmark Observation:] $||R_i^T (p_k - t_i) - overline(p)_(i k)||_2^2 = ||R_i(R_i^T (p_k - t_i) - overline(p)_(i k))||_2^2 = ||(p_k - t_i) - R_i overline(p)_(i k)||_2^2$
+
+  #strong[Odometry Translation:] $||R_i^T (t_j - t_i) - overline(t)_(i j)||_2^2 = ||(t_j - t_i) - R_i overline(t)_(i j)||_2^2$
+  
+  #strong[Odometry Rotation:] $||R_j - R_i overline(R)_(i j)||_F^2$, which is merely related to $R$ but not $t, p$.
+
+  Let #math.cases(
+  $J_"rot"(R) = ||R_j - R_i overline(R)_(i j)||_F^2$,
+  $J_"lin"(t, p|R) = Sigma_((i, k) in epsilon_l)||p_k - t_i - R_i overline(p)_(i k)||_2^2 + Sigma_((i, k) in epsilon_0) = ||t_j - t_i - R_i overline(t)_(i j)||_2^2$
+  )
+
+  We can define that:
+  - $x$ is the stacked vector of all linear variables --- $x = [t_1^T, dots, t_N^T, p_1^T, dots, p_M^T]$
+  - $b(R)$ is the measurement vector including rotational terms, which $R_i overline(p)_(i k)$ and $R_i overline(t)_(i j)$ are constants here.
+
+  $therefore$ $J_"lin" (x|R) = ||A x - b(R)||_2^2$, which $A$ is the incidence matrix only involves $I$, $-I$, and $0$ but not depends on $R$.
+
+  $because$ $A^T A x^* = A^T b(R) => x^*(R) = (A^T A)^† A^T b(R)$, which $†$ means if the absolute position is not fixed, the system may be rank deficient. \
+  $therefore$ $J_"reduced" (R) = ||A (A^T A)^† A^T b(R) - b(R)||_2^2 + J_"rot" (R)$
+
+  By the property of projection matrix, we have \
+  $J_"reduced" (R) = b(R)^T (I - P_A) b(R) + J_"rot" (R)$, which $P_A = A(A^T A)^† A^T$ is the column-space projection matrix of the vector $A$.
+
+  That's we successfully get an expression $J_"reduced" (R)$, which completely remove $t$ and $p$ and only involves $R$. \
+  The proof is complete.
 ]
 
 #boldify[
@@ -440,7 +486,24 @@
 ]
 
 #indent[
-  ...
+  The core reason is the loss of Sparsity:
+
+  #strong[Sparsity of the origin problem:]
+
+  In the original problem involving all variables ($t_i, R_i, p_k$), the Hessian matrix (or the system matrix in normal equations $A^T A$) is highly *sparse*. This is because the graph structure is sparse: a robot pose only connects to its immediate neighbors via odometry, and a landmark only connects to the specific poses that observed it. Efficient sparse linear solvers can solve such systems with a complexity often linear in the number of variables, i.e., $O(N + M)$.
+
+  #strong[Sparsity after eliminating (Fill-in):]
+
+  The algebraic process of eliminating variables $t_i$ and $p_k$ is equivalent to *marginalization* in the probabilistic graphical model. Marginalizing out a variable creates a clique (fully connected subgraph) among all variables connected to it.
+  - Eliminating a landmark connects all poses that observed it.
+  - Eliminating translations further couples the remaining rotation variables.
+  This phenomenon is called *Fill-in*. Consequently, the resulting Hessian for the rotation-only problem becomes a *dense matrix* (or a very dense block-banded matrix), losing the original sparse structure.
+
+  #strong[Cost Comparison:]
+  + *Original Sparse Problem*: Solving a large but sparse system typically costs proportional to the number of non-zeros, roughly $O(N)$.
+  + *Reduced Rotation-only Problem*: Solving a dense system of size $3N times 3N$ requires standard dense factorization (e.g., dense Cholesky), which has a cubic complexity of $O((3N)^3) approx O(N^3)$.
+
+  Therefore, for large $N$, solving the reduced dense problem is computationally much more demanding than solving the original larger-but-sparse problem.
 ]
 
 /**************   Team Work   **************/
@@ -482,7 +545,7 @@
 
   #figure(
     box(
-      width: 85%,
+      width: 80%,
       grid(
         columns: 2,
         gutter: 1em,
@@ -505,7 +568,7 @@
 
   #figure(
     box(
-      width: 85%,
+      width: 80%,
       grid(
         columns: 2,
         gutter: 1em,
@@ -537,7 +600,7 @@
 
   #figure(
     box(
-      width: 85%,
+      width: 80%,
       grid(
         columns: 2,
         gutter: 1em,
@@ -563,17 +626,44 @@
   4. *Speeds:* The velocity profile derived from the aligned LDSO trajectory matches the VIO pipelines. This confirms that the temporal consistency of the estimated pose is preserved, meaning the "virtual speed" in the scaled monocular frame corresponds linearly to the real-world speed after Sim3 alignment.
 ]
 
-/**************   Reflection and Analysis   **************/
-= Reflection and Analysis
+/************** Reflection and Analysis   **************/
+== Reflection and Analysis
 
-/**************   Conclusion   **************/
-= Conclusion
+#indent[
+  Through the combination of theoretical derivations in the "Spy Game" and practical experiments with multiple SLAM pipelines (OrbSlam, Kimera, LDSO), several key insights regarding the design and performance of SLAM systems have been obtained:
 
-#pagebreak()
+  #strong[1. The Critical Role of Sparsity in Optimization]
+  In the individual work, we mathematically proved that the SLAM problem could be reduced to a rotation-only optimization problem, decreasing variables from $6N+3M$ to $3N$. However, we identified that this reduction comes at a high cost: *the loss of sparsity*.
+  - The "Spy Game" visually demonstrated that marginalizing landmarks creates dense blocks (Fill-in) in the information matrix.
+  - While solving a large sparse system is typically $O(N)$, solving a reduced but dense system explodes to $O(N^3)$.
+  
+  This explains why state-of-the-art backends (like `g2o` used in ORB-SLAM and LSD-SLAM) do not naively eliminate all points. Instead, they exploit the sparse block structure of the Bundle Adjustment problem to solve it efficiently in real-time.
 
-/**************   Source Code   **************/
-#set page(header: none, footer: none) 
+  #strong[2. Feature-based (Indirect) vs. Direct Methods]
+  Comparing ORB-SLAM/Kimera (Feature-based) with LDSO (Direct) highlights a fundamental trade-off:
+  - *Robustness vs. Accuracy:* Feature-based methods (ORB-SLAM) proved robust to illumination changes and large baselines because descriptors (ORB) are invariant to brightness. In contrast, Direct methods (LDSO/LSD-SLAM) rely on the *photometric consistency assumption*. While LDSO generated smoother trajectories in the EuRoC dataset, theoretical analysis suggests it would be more sensitive to auto-exposure or dynamic lighting.
+  - *Map Density:* ORB-SLAM produces a sparse point cloud, which is efficient for tracking but less useful for navigation. LDSO produces a semi-dense reconstruction (recovering geometry from all high-gradient pixels), which provides better structural awareness of the environment.
 
-= Source Code <section:source_code>
-- 
--
+  #strong[3. Scale Ambiguity and Sensor Fusion]
+  The experiments explicitly demonstrated the limitations of Monocular VO:
+  - When running Kimera and OrbSlam3 (likely in Stereo/VIO configuration), the trajectories were closer to the ground truth scale.
+  - When running LDSO (Monocular), the trajectory shape was correct, but the scale was arbitrary. We had to use `evo --correct_scale` (`Sim3` alignment) to make the comparison meaningful.
+  
+  This reinforces the importance of sensor fusion (IMU + Visual) or stereo vision in robotics. For a pure monocular system, scale drift is inevitable over long trajectories unless corrected by loop closures (`Sim3` optimization) as discussed in the LSD-SLAM paper.
+]
+
+/************** Conclusion   **************/
+== Conclusion
+
+#indent[
+  In this final lab, we successfully bridged the gap between the mathematical foundations of SLAM and its practical application.
+  
+  On the theoretical side, by analyzing the sparsity pattern of the information matrix, we understood the computational implications of variable elimination. We proved that while marginalization reduces the state space dimension, preserving the sparse structure is often more critical for computational efficiency. This theoretical framework underpins the backend design of modern SLAM systems.
+
+  On the practical side, we evaluated three distinct pipelines—*Kimera* (VIO/Feature-based), *ORB-SLAM3* (Feature-based), and *LDSO* (Direct)—on the EuRoC dataset.
+  - We confirmed that *Feature-based methods* excel in versatility and robustness, utilizing invariant descriptors to maintain tracking under various conditions.
+  - We observed that *Direct methods* can recover richer semi-dense maps and achieve high tracking accuracy by exploiting photometric information, though they require strict photometric calibration.
+  - We validated that *Monocular systems* suffer from inherent scale ambiguity, necessitating Sim3 alignment for evaluation, whereas Stereo/VIO systems provide metric estimates.
+
+  Overall, this lab demonstrated that there is no "one-size-fits-all" SLAM solution. The choice between Direct vs. Indirect, or Dense vs. Sparse, depends on the specific constraints of the environment (e.g., illumination) and the requirements of the application (navigation map vs. localization speed).
+]
