@@ -627,7 +627,7 @@
 ]
 
 /************** Reflection and Analysis   **************/
-== Reflection and Analysis
+= Reflection and Analysis
 
 #indent[
   Through the combination of theoretical derivations in the "Spy Game" and practical experiments with multiple SLAM pipelines (OrbSlam, Kimera, LDSO), several key insights regarding the design and performance of SLAM systems have been obtained:
@@ -653,7 +653,7 @@
 ]
 
 /************** Conclusion   **************/
-== Conclusion
+= Conclusion
 
 #indent[
   In this final lab, we successfully bridged the gap between the mathematical foundations of SLAM and its practical application.
